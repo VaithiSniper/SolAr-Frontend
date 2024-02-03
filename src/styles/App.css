@@ -1,0 +1,33 @@
+body {
+  background-image: url("https://solana.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsolana-ring.630baeb2.jpg&w=3840&q=75");
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh !important;
+  background-size: 100vw 100vh;
+  margin: 0;
+  font-family: var(--font-lexend),"Cantarell", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 18px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.frame {
+  background-color: #ddc;
+  border: solid 5vmin #eee;
+  border-bottom-color: #fff;
+  border-left-color: #eee;
+  border-radius: 2px;
+  border-right-color: #eee;
+  border-top-color: #ddd;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.25) inset,
+    0 5px 10px 5px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  display: inline-block;
+  position: relative;
+  text-align: center;
+}
