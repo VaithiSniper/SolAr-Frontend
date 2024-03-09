@@ -4,8 +4,9 @@ import { Heading } from "@chakra-ui/react";
 
 export function HomeContent() {
   const { publicKey } = useWallet();
-  const prevPublickKey = React.useRef<string>(publicKey?.toBase58() || "");
 
+  // If you change your wallet, then refresh
+  const prevPublickKey = React.useRef<string>(publicKey?.toBase58() || "");
   // Reset the state if wallet changes or disconnects
   React.useEffect(() => {
     if (publicKey && publicKey.toBase58() !== prevPublickKey.current) {

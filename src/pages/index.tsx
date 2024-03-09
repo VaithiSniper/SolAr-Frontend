@@ -15,7 +15,6 @@ import { toast } from "react-hot-toast";
 import { Footer } from "@components/layout/footer";
 
 const Home: NextPage = () => {
-
   return (
     <>
       <Head>
