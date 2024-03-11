@@ -4,6 +4,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { Flex, Button, HStack, chakra, Heading } from '@chakra-ui/react';
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 type navLink = {
   label: string;
@@ -11,6 +12,11 @@ type navLink = {
 }
 
 export function Header() {
+  const route = useRouter()
+  const path = route.pathname
+
+  const currentPathStyles = 'mx-4 underline'
+  const defaultStyles = 'mx-4'
   const { connected, wallets } = useWallet();
   const data: navLink[] = [
     { label: "Link1", link: "/link1" },
@@ -18,37 +24,19 @@ export function Header() {
   ]
 
   return (
-    <chakra.header id="header" color='black' backgroundColor='white'>
-      <Flex
-        w="100%"
-        px="6"
-        py="8"
-        align="center"
-        justify="space-between"
-      >
-        <Link href="/">
-          <div className="flex flex-row gap-x-4">
-            <Image src={"/logo.png"} height={52} width={52} alt="SolAr Logo" />
-            <div className="my-auto">
-              <Heading fontWeight={600}>
-                SolAr
-              </Heading>
-            </div>
-          </div>
-        </Link>
-        <HStack as="nav" spacing="5" className="space-x-8">
-          {data.map((item, i) => (
-            <Link href={item.link} key={i}>
-              <Button variant="nav"> {item.label} </Button>
-            </Link>
-          ))}
-        </HStack>
+    <>
+      <div className="navbar bg-base-100 flex flex-row justify-between">
+        <div>
+          <Link className="flex flex-row" href="/">
+            <Image alt="get eyes" src="/logo.png" width={50} height={50}></Image><a className="btn btn-ghost text-xl">SolAr</a>
+          </Link>
+        </div>
+        <div>
+          <Link className={path.includes("/myCases") ? currentPathStyles : defaultStyles} href="/myCases" >My Cases</Link>
+          <WalletMultiButton style={{ backgroundColor: "black" }}></WalletMultiButton>
+        </div>
 
-        <HStack margin="5" className="bg-gray-700 rounded-lg">
-          <WalletMultiButton />
-        </HStack>
-
-      </Flex>
-    </chakra.header >
+      </div>
+    </>
   );
 }
