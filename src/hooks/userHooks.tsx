@@ -1,62 +1,60 @@
 import * as anchor from '@project-serum/anchor'
 import { useEffect, useMemo, useState } from 'react'
-import * as solarIDL from '../constants/idl.json'
+import solarIDL from '../constants/idl.json'
 import toast from 'react-hot-toast'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
 
-export function useCase() {
+export function useUser() {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
   const anchorWallet = useAnchorWallet()
 
   const [isExisitingUser, setIsExistingUser] = useState(false)
-  const [caseId, setCaseId] = useState("000")
   const [loading, setLoading] = useState(false)
 
   const program = useMemo(() => {
+    console.log("SOLAR IDL", solarIDL)
     if (anchorWallet) {
       const provider = new anchor.AnchorProvider(connection, anchorWallet, anchor.AnchorProvider.defaultOptions())
-      const programId = new PublicKey(solarIDL.IDL.metadata.address)
-      const programIdl = JSON.parse(JSON.stringify(solarIDL.IDL)) // to circumvent typescript issue
+      const programId = new PublicKey(solarIDL.metadata.address)
+      const programIdl = JSON.parse(JSON.stringify(solarIDL)) // to circumvent typescript issue
       return new anchor.Program(programIdl, programId, provider)
     }
   }, [connection, anchorWallet])
 
   useEffect(() => {
-    const getCases = async () => {
+    const checkUserExists = async () => {
       if (program && publicKey) {
         try {
           setLoading(true)
-          const [casePDA] = findProgramAddressSync([utf8.encode('CASE'), publicKey.toBuffer()], program.programId)
-          const caseAccount = await program.account.Case.fetch(casePDA)
-          if (caseAccount) {
+          const [userProfilePDA] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+          const userAccount = await program.account.userProfile.fetch(userProfilePDA)
+          if (userAccount) {
             setIsExistingUser(true)
-            setCaseId(caseAccount?.case_id || "case_id not set")
           } else {
             setIsExistingUser(false)
           }
         } catch (error) {
           console.log(error)
           setIsExistingUser(false)
-          setCaseId("Some error occurred")
         } finally {
           setLoading(false)
         }
       }
     }
-    getCases()
+    checkUserExists()
   }, [publicKey, program])
 
-  const initializeUser = async () => {
+  const initializeUser = async (username: string) => {
     if (program && publicKey) {
       try {
-        const [profilePda] = findProgramAddressSync([utf8.encode('CASE'), publicKey.toBuffer()], program.programId)
-        const tx = await program.methods.setupCase()
+        const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const tx = await program.methods.setupUser(username)
           .accounts({
-            userProfile: profilePda,
+            user: profilePda,
             authority: publicKey,
             systemProgram: SystemProgram.programId,
           })
