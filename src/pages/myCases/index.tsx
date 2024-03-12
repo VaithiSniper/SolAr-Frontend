@@ -23,13 +23,15 @@ function App() {
     var lawsuits: CaseCard[] = [
         {
             "name": "one",
-            "description": { "date": new Date(), status: CaseState.Active }
+            "description": { "date": new Date(), status: CaseState.Disposed }
         },
         {
             "name": "two",
             "description": { "date": new Date(), status: CaseState.Active }
         }
     ]
+    const statusStyle = 'text-green-500 text-sm '
+    const other = 'text-sm text-blue-500'
 
     return (<><div><Header />
         <div className="text-white text-4xl text-center my-4">Ongoing Cases</div>
@@ -37,12 +39,12 @@ function App() {
             {lawsuits.map((lawsuit) =>
                 <div className="card w-96 mt-4 bg-white text-black">
                     <div className="card-body">
+                        <p className={lawsuit.description.status == "Ongoing" ? statusStyle : other}>{lawsuit.description.status}</p>
                         <h2 className="card-title text-2xl">{lawsuit.name}</h2>
                         <p className="text-md">Next hearing: {lawsuit.description.date.toDateString()}</p>
-                        <p className="text-md">Status: {lawsuit.description.status}</p>
 
                         <div className="card-actions justify-end">
-                            <Link href="/myCases/case1"><button className="btn bg-gray-800 hover:bg-slate-600 text-white">Details &gt;</button>
+                            <Link href={"/myCases/" + lawsuit.name}><button className="btn bg-gray-800 hover:bg-slate-600 text-white">Details &gt;</button>
                             </Link>
                         </div>
                     </div>
