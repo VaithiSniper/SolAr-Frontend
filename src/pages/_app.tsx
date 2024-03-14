@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import ClientWalletProvider from "@components/contexts/ClientWalletProvider";
-import { NETWORK } from "@utils/endpoints";
+import { NETWORK, SOLANA_DEV } from "@utils/endpoints";
 
 import "../styles/globals.css";
 import "../styles/App.css";
@@ -12,6 +12,8 @@ import { Toaster } from "react-hot-toast";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "../../lib/theme/theme.js"
 import { fonts } from '../../lib/fonts/fonts.js'
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { clusterApiUrl } from "@solana/web3.js";
 
 const ReactUIWalletModalProviderDynamic = dynamic(
   async () =>
@@ -21,9 +23,10 @@ const ReactUIWalletModalProviderDynamic = dynamic(
 
 function MyApp({ Component, pageProps }: AppProps) {
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
-
+  const network = WalletAdapterNetwork.Devnet
+  const rpcUrl = useMemo(() => clusterApiUrl(network), [])
   return (
-    <ConnectionProvider endpoint={NETWORK}>
+    <ConnectionProvider endpoint={SOLANA_DEV}>
       <ClientWalletProvider wallets={wallets}>
         <ReactUIWalletModalProviderDynamic>
           <Toaster position="bottom-right" reverseOrder={true} />
