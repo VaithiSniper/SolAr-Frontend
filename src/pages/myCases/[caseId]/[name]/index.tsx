@@ -7,17 +7,18 @@ function App() {
         <div className="text-sm p-3 bg-violet-300 breadcrumbs">
             <ul>
                 <li><Link href="/myCases">My Cases</Link></li>
-                <li>{router.query.caseId}</li>
+                <li><Link href={"/myCases/" + router.query.caseId}>{router.query.caseId}</Link></li>
+                <li className="font-semibold text-gray-800">{router.query.name}</li>
             </ul>
         </div>
         <div className="flex flex-col">
 
             {/* body */}
             <div className="flex flex-row">
-                <div><iframe src="https://drive.google.com/file/d/1DCNkUc9zfwZzANnjudToPFPIkoC0ulpE/preview" width="640" height="480" allow="autoplay"></iframe></div>
-                <div className="divider-horizontal w-[6px] bg-white"></div>
+                <div className=" flex flex-row w-3/4 mt-8 justify-center"><iframe src="https://drive.google.com/file/d/1DCNkUc9zfwZzANnjudToPFPIkoC0ulpE/preview" width="640" height="480" allow="autoplay"></iframe></div>
+                <div className="divider-horizontal w-[4px] mt-8 bg-white"></div>
                 <div className="flex flex-col ">
-                    <div className="text-2xl text-white">Document change history</div>
+                    <div className="text-2xl mt-8 text-white">Document change history</div>
                     <ul className="steps text-white steps-vertical">
                         <li className="step step-primary">Upload version 1</li>
                         <li className="step step-primary">upload version 2</li>

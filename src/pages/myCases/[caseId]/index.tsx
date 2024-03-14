@@ -9,7 +9,7 @@ function App() {
         <div className="text-sm p-3 bg-violet-300 breadcrumbs">
             <ul>
                 <li><Link href="/myCases">My Cases</Link></li>
-                <li>{router.query.caseId}</li>
+                <li className="font-semibold text-gray-800">{router.query.caseId}</li>
             </ul>
         </div>
         <div className="flex flex-col">
@@ -22,7 +22,7 @@ function App() {
             </div>
             {/* body */}
             <div className="flex flex-row">
-                <div className="grid grid-cols-4 col-span-4 gap-12 mt-2 p-2 w-3/4">
+                <div className="grid grid-cols-4 col-span-4 h-2/5 gap-12 mt-4 p-2 w-3/4">
                     {fileCollection.map(file =>
                         <button className="p-4 rounded-2xl border border-white flex flex-col justify-center items-center text-white gap-y-4">
                             <Link href={"/myCases/" + router.query.caseId + "/" + file.name}>
@@ -35,8 +35,8 @@ function App() {
                     )}
 
                 </div>
-                <div className="divider-horizontal w-[6px] bg-white"></div>
-                <div className="flex flex-col ">
+                <div className="divider-horizontal mt-4 w-[4px] bg-white"></div>
+                <div className="flex mt-4 h-screen flex-col ">
                     <div className="text-2xl text-white">Case change history</div>
                     <ul className="steps text-white steps-vertical">
                         <li className="step step-primary">s1</li>
