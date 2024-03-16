@@ -23,6 +23,8 @@ export function Header() {
     { label: "Link2", link: "/link2" }
   ]
 
+  const { publicKey } = useWallet()
+
   return (
     <>
       <div className="navbar bg-base-100 flex flex-row justify-between">
@@ -33,9 +35,24 @@ export function Header() {
         </div>
         <div>
           <Link className={path.includes("/myCases") ? currentPathStyles : defaultStyles} href="/myCases" >My Cases</Link>
-          <WalletMultiButton style={{ backgroundColor: "black" }}></WalletMultiButton>
+          {
+            publicKey ?
+              <Link href="/profile">
+                <div tabIndex={0} role="button" className="btn m-1 bg-fuchsia-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 24 24">
+                    <path d="M12,2C6.477,2,2,6.477,2,12c0,5.523,4.477,10,10,10s10-4.477,10-10C22,6.477,17.523,2,12,2z M12,4.75 c1.795,0,3.25,1.455,3.25,3.25s-1.455,3.25-3.25,3.25S8.75,9.795,8.75,8S10.205,4.75,12,4.75z M12,20 c-2.77,0-5.21-1.408-6.646-3.547C6.475,14.823,10.046,14,12,14s5.525,0.823,6.646,2.453C17.21,18.592,14.77,20,12,20z"></path>
+                  </svg>
+                </div>
+              </Link>
+              :
+              <div tabIndex={0} role="button" className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black">
+                <Link href="/login">
+                  Login
+                </Link>
+              </div>
+          }
+          {/* <WalletMultiButton style={{ backgroundColor: "black" }}></WalletMultiButton> */}
         </div>
-
       </div>
     </>
   );

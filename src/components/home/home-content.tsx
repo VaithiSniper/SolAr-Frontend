@@ -1,6 +1,6 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import React, { ChangeEvent, useState } from "react";
-import { Button } from "./button";
+import { Button } from "../general/button";
 import { useUser } from "src/hooks/userHooks";
 
 export function HomeContent() {
@@ -47,7 +47,7 @@ export function HomeContent() {
               <Button
                 onClick={handleInitializeUser}
                 state={loading ? "loading" : "initial"}
-                className="bg-pink-500 rounded-lg p-4"
+                className="p-2 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center"
               >
                 Initialize
               </Button>
@@ -55,7 +55,7 @@ export function HomeContent() {
           </div>
         ) : (
           <p className="text-center text-2xl">
-            Welcome back, <strong>{user.name}</strong>
+            Welcome back, <strong>{user.username}</strong>
             {/* <table> */}
             {/*   <tr> */}
             {/*     <th>Total Cases</th> */}

@@ -13,6 +13,7 @@ import theme from "../../lib/theme/theme.js"
 import { fonts } from '../../lib/fonts/fonts.js'
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
+import { Header } from "@components/layout/header";
 
 const ReactUIWalletModalProviderDynamic = dynamic(
   async () =>
@@ -36,6 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
       `}
           </style>
+          <Header />
           <Component {...pageProps} />
         </ReactUIWalletModalProviderDynamic>
       </ClientWalletProvider>

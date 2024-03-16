@@ -6,16 +6,11 @@ export type ButtonState = "initial" | "loading" | "success" | "error";
 
 type Props = {
   state: ButtonState;
-  onClick: () => void;
+  onClick: Function;
   children: ReactNode;
   className?: string;
 };
 export function Button({ state, onClick, children, className }: Props) {
-  const { publicKey } = useWallet();
-
-  if (!publicKey) {
-    return null;
-  }
 
   const buttonClasses = classNames("btn", className);
 

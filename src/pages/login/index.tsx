@@ -1,21 +1,21 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
-import { Header } from "@components/layout/header";
-import { HomeContent } from "@components/home/home-content";
+import { ProfileContent } from "@components/profile/profile-content";
+import { LoginContent } from "@components/login/login-content";
 
 
 const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>SolAr: Home</title>
+        <title>SolAr: Login</title>
         <meta
           name="description"
           content="SolAr: Storage Layer for the future"
         />
       </Head>
-      <HomeContent />
+      <LoginContent />
       {/* <Footer /> */}
     </>
   );
