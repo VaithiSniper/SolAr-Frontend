@@ -3,20 +3,20 @@ import Link from "next/link"
 
 
 type CaseCard = {
-    name: string,
-    description: {
-        date: Date,
-        status: CaseState
-    }
+  name: string,
+  description: {
+    date: Date,
+    status: CaseState
+  }
 }
 
 enum CaseState {
-    ToStart = "Yet to start",
-    WaitingForParticipants = "Waiting for participants",
-    Active = "Ongoing",
-    AwaitingRuling = "Awaiting ruling",
-    Disposed = "Disposed",
-    Completed = "Completed"
+  ToStart = "Yet to start",
+  WaitingForParticipants = "Waiting for participants",
+  Active = "Ongoing",
+  AwaitingRuling = "Awaiting ruling",
+  Disposed = "Disposed",
+  Completed = "Completed"
 }
 
 function App() {
@@ -33,7 +33,9 @@ function App() {
     const statusStyle = 'text-green-500 text-sm '
     const other = 'text-sm text-blue-500'
 
-    return (<><div><Header />
+  return (
+    <>
+      <div>
         <div className="text-white text-4xl text-center my-4">Ongoing Cases</div>
         <div className="flex flex-row gap-x-4 justify-center">
             {lawsuits.map((lawsuit) =>
@@ -49,8 +51,12 @@ function App() {
                         </div>
                     </div>
                 </div>
-            )}
+              </div>
+            </div>
+          )}
         </div>
-    </div></>)
+      </div>
+    </>
+  )
 }
 export default App

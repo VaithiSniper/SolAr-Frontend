@@ -35,7 +35,45 @@
       ],
       "args": [
         {
-          "name": "name",
+          "name": "username",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "setupUserProfile",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "name": "firstName",
+          "type": "string"
+        },
+        {
+          "name": "lastName",
+          "type": "string"
+        },
+        {
+          "name": "phone",
           "type": "string"
         }
       ]
@@ -148,7 +186,23 @@
             "type": "publicKey"
           },
           {
-            "name": "name",
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "firstName",
+            "type": "string"
+          },
+          {
+            "name": "lastName",
+            "type": "string"
+          },
+          {
+            "name": "phone",
             "type": "string"
           },
           {
@@ -228,6 +282,6 @@
     }
   ],
   "metadata": {
-    "address": "5fKgTaJb1rvV37ouDHM2iUneownek1oauExofQ5SgoNA"
+    "address": "5VtZR4MbaJb4iSY5rdvF8a3YdWECUNvvtajYrSJD1f9L"
   }
 }

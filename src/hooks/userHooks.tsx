@@ -7,6 +7,29 @@ import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
 
+export type UserProfile = {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  latestCase: 0;
+  casesCount: 0;
+}
+export interface UserProfileAccount extends UserProfile {
+  authority?: PublicKey;
+}
+
+export const initialDefaultUserProfile: UserProfile = {
+  username: "",
+  email: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  latestCase: 0,
+  casesCount: 0,
+}
+
 export function useUser() {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
@@ -14,9 +37,9 @@ export function useUser() {
 
   const [isExisitingUser, setIsExistingUser] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<UserProfile>(initialDefaultUserProfile)
 
   const program = useMemo(() => {
-    console.log("SOLAR IDL", solarIDL)
     if (anchorWallet) {
       const provider = new anchor.AnchorProvider(connection, anchorWallet, anchor.AnchorProvider.defaultOptions())
       const programId = new PublicKey(solarIDL.metadata.address)
@@ -31,9 +54,12 @@ export function useUser() {
         try {
           setLoading(true)
           const [userProfilePDA] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-          const userAccount = await program.account.userProfile.fetch(userProfilePDA)
+          const userAccount: UserProfileAccount = await program.account.userProfile.fetch(userProfilePDA)
           if (userAccount) {
             setIsExistingUser(true)
+            delete userAccount.authority
+            console.log(userAccount)
+            setUser(userAccount)
           } else {
             setIsExistingUser(false)
           }
@@ -69,5 +95,24 @@ export function useUser() {
     }
   }
 
-  return { isExisitingUser, initializeUser, loading }
+  const initializeUserProfile = async (email: string, firstName: string, lastName: string, phone: string) => {
+    if (program && publicKey) {
+      try {
+        const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const tx = await program.methods.setupUserProfile(email, firstName, lastName, phone)
+          .accounts({
+            user: profilePda,
+            authority: publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully user profile.')
+      } catch (err: any) {
+        console.log(err)
+        toast.error(err.toString())
+      }
+    }
+  }
+
+  return { isExisitingUser, initializeUser, initializeUserProfile, loading, setLoading, user }
 }
