@@ -4,12 +4,11 @@ import dynamic from "next/dynamic";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import ClientWalletProvider from "@components/contexts/ClientWalletProvider";
-import { NETWORK, SOLANA_DEV } from "@utils/endpoints";
+import { SOLANA_DEV } from "@utils/endpoints";
 
 import "../styles/globals.css";
 import "../styles/App.css";
 import { Toaster } from "react-hot-toast";
-import { ChakraProvider } from "@chakra-ui/react";
 import theme from "../../lib/theme/theme.js"
 import { fonts } from '../../lib/fonts/fonts.js'
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
@@ -37,9 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
       `}
           </style>
-          <ChakraProvider theme={theme}>
-            <Component {...pageProps} />
-          </ChakraProvider>
+          <Component {...pageProps} />
         </ReactUIWalletModalProviderDynamic>
       </ClientWalletProvider>
     </ConnectionProvider>

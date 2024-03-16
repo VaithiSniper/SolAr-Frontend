@@ -14,6 +14,11 @@ export function useUser() {
 
   const [isExisitingUser, setIsExistingUser] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState({
+    name: "VaithiSniper",
+    latestCase: 0,
+    casesCount: 0,
+  })
 
   const program = useMemo(() => {
     console.log("SOLAR IDL", solarIDL)
@@ -34,6 +39,8 @@ export function useUser() {
           const userAccount = await program.account.userProfile.fetch(userProfilePDA)
           if (userAccount) {
             setIsExistingUser(true)
+            delete userAccount.authority
+            setUser(userAccount)
           } else {
             setIsExistingUser(false)
           }
@@ -69,5 +76,5 @@ export function useUser() {
     }
   }
 
-  return { isExisitingUser, initializeUser, loading }
+  return { isExisitingUser, initializeUser, loading, user }
 }
