@@ -34,7 +34,15 @@ export function Header() {
           </Link>
         </div>
         <div>
-          <Link className={path.includes("/myCases") ? currentPathStyles : defaultStyles} href="/myCases" >My Cases</Link>
+          {/* links that should be accessible only after logging in */}
+          {
+            publicKey ?
+              <>
+                <Link className={path.includes("/myCases") ? currentPathStyles : defaultStyles} href="/myCases" >My Cases</Link>
+              </>
+              : null
+          }
+          {/* login or profile button is always displayed */}
           {
             publicKey ?
               <Link href="/profile">
@@ -51,7 +59,6 @@ export function Header() {
                 </Link>
               </div>
           }
-          {/* <WalletMultiButton style={{ backgroundColor: "black" }}></WalletMultiButton> */}
         </div>
       </div>
     </>

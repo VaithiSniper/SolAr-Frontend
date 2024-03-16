@@ -9,8 +9,6 @@ import { SOLANA_DEV } from "@utils/endpoints";
 import "../styles/globals.css";
 import "../styles/App.css";
 import { Toaster } from "react-hot-toast";
-import theme from "../../lib/theme/theme.js"
-import { fonts } from '../../lib/fonts/fonts.js'
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { Header } from "@components/layout/header";
@@ -24,19 +22,12 @@ const ReactUIWalletModalProviderDynamic = dynamic(
 function MyApp({ Component, pageProps }: AppProps) {
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
   const network = WalletAdapterNetwork.Devnet
-  const rpcUrl = useMemo(() => clusterApiUrl(network), [])
+  const rpcUrl = useMemo(() => clusterApiUrl(network), [network])
   return (
     <ConnectionProvider endpoint={SOLANA_DEV}>
       <ClientWalletProvider wallets={wallets}>
         <ReactUIWalletModalProviderDynamic>
           <Toaster position="bottom-right" reverseOrder={true} />
-          <style jsx global>
-            {`
-        :root {
-          --font-lexend: ${fonts.lexend.style.fontFamily};
-        }
-      `}
-          </style>
           <Header />
           <Component {...pageProps} />
         </ReactUIWalletModalProviderDynamic>
