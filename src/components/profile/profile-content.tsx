@@ -38,7 +38,7 @@ export function ProfileContent() {
     else {
       router.push("/")
     }
-  }, [loading, user, isExisitingUser, isEditing, router]);
+  }, [user, isExisitingUser]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
