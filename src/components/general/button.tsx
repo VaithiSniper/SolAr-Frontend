@@ -1,12 +1,12 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import classNames from "classnames";
-import React, { ReactNode } from "react";
+import React, { MouseEventHandler, ReactNode } from "react";
 
 export type ButtonState = "initial" | "loading" | "success" | "error";
 
 type Props = {
   state: ButtonState;
-  onClick: Function;
+  onClick: MouseEventHandler<HTMLButtonElement>;
   children: ReactNode;
   className?: string;
 };

@@ -1,7 +1,5 @@
 import React from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { Flex, Button, HStack, chakra, Heading } from '@chakra-ui/react';
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";

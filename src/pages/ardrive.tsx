@@ -1,4 +1,10 @@
-import { readJWKFile, arDriveFactory, deriveDriveKey } from 'ardrive-core-js';
+import { readJWKFile, arDriveFactory, deriveDriveKey, JWKWallet, CreatePrivateFolderParams, EntityID } from 'ardrive-core-js';
+
+interface CreatePrivateFolderPayload {
+  folderName: string;
+  driveKey: string;
+  parentFolderId?: string;
+}
 
 const arDriveWallet = process.env.ARDRIVE_WALLET_ADDRESS;
 const arDrivePassword = process.env.ARDRIVE_WALLET_PASSWORD;
@@ -15,15 +21,24 @@ async function createDrive(caseId: string) {
   const createDriveResult = await arDrive.createPublicDrive({ driveName: caseId });
 }
 
-// async function getDriveKey(driveId: string) {
-//   return await deriveDriveKey(
-//     'mySecretPassWord',
-//     '12345674a-eb5e-4134-8ae2-a3946a428ec7',
-//     JSON.stringify((myWallet as JWKWallet).getPrivateKey())
-//   );
-// }
+async function getDriveKey(driveId: string) {
+  const myWallet = readJWKFile('../../ardrive-wallet.json');
+  return await deriveDriveKey(
+    arDrivePassword || "",
+    driveId,
+    JSON.stringify((myWallet as JWKWallet).getPrivateKey())
+  );
+}
 
-// async function createPrivateFolder(driveId: string, folderName: type) {
+async function createPrivateFolder(driveId: string, folderName: string, parentFolderId: EntityID) {
+  const driveKey = await getDriveKey(driveId)
+  const arDrive = getArDriveInstance()
+  const createFolderResult = await arDrive.createPrivateFolder({
+    folderName,
+    driveKey,
+    parentFolderId
+  })
+}
 
-// }
 
+export { createDrive, createPrivateFolder, getDriveKey }
