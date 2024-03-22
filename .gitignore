@@ -1,4 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Ardrive Wallet file
+ardrive-wallet.json
 
 # dependencies
 /node_modules

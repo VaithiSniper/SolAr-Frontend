@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { UserProfile } from "src/hooks/userHooks";
 import Avatar from "../general/avatar";
 import { Button } from "../general/button";
+import QRCode from "react-qr-code";
 
 export function ProfileContent() {
   // Router instance to navigate
@@ -66,21 +67,27 @@ export function ProfileContent() {
       <h1 className="text-center text-banner font-heading">
         Profile
       </h1>
+      <dialog id="QRCodeModal" className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <QRCode
+            size={256}
+            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+            value={publicKey?.toString() || ""}
+            viewBox={`0 0 256 256`}
+          />
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn bg-red-600 hover:bg-red-700 text-white">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
       <div className="justify-center flex">
-        {/* <table> */}
-        {/*   <tr> */}
-        {/*     <th>Total Cases</th> */}
-        {/*     <th>Latest Case</th> */}
-        {/*   </tr> */}
-        {/*   <tr> */}
-        {/*     <td>{user.casesCount}</td> */}
-        {/*     <td>{user.latestCase}</td> */}
-        {/*   </tr> */}
-        {/* </table> */}
         <div className="card w-96 bg-base-100 shadow-xl">
           <div className="card-body">
             <Avatar imageOrChar={userProfile.username.substring(0, 1)} />
-            <form className="max-w-md mx-auto">
+            <form className="max-w-md mx-auto" onSubmit={(e) => { e.preventDefault() }}>
               <div className="relative z-0 w-full mb-5 group">
                 <input disabled type="text" name="username" id="username" value={userProfile.username} onChange={handleChange} className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                 <label htmlFor="username" className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Username</label>
@@ -111,7 +118,10 @@ export function ProfileContent() {
                       <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(false)} className="p-2 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Cancel</Button>
                     </>
                     :
-                    <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(true)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Edit</Button>
+                    <>
+                      <Button onClick={() => { document.getElementById("QRCodeModal").showModal() }} state={publicKey ? "initial" : "loading"} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Show QR Code</Button>
+                      <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(true)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Edit</Button>
+                    </>
                 }
               </div>
             </form>

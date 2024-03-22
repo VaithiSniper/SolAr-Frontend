@@ -1,6 +1,7 @@
 import React from "react";
 
 export function HomeContent() {
+
   return (
     <div className="text-white m-8 w-full justify-center">
       <h1 className="text-center text-banner font-heading">
