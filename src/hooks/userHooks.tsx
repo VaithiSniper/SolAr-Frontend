@@ -7,6 +7,11 @@ import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
 
+import { Solar } from 'src/constants/solar'
+
+export type UserType = anchor.IdlTypes<Solar>["UserType"];
+
+
 export type UserProfile = {
   username: string;
   email: string;
@@ -54,7 +59,8 @@ export function useUser() {
         try {
           setLoading(true)
           const [userProfilePDA] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-          const userAccount: UserProfileAccount = await program.account.userProfile.fetch(userProfilePDA)
+          const userAccount: any = await program.account.userProfile.fetch(userProfilePDA)
+          console.log('user account is', userAccount)
           if (userAccount) {
             setIsExistingUser(true)
             delete userAccount.authority
@@ -74,11 +80,12 @@ export function useUser() {
     checkUserExists()
   }, [publicKey, program])
 
-  const initializeUser = async (username: string) => {
+  const initializeUser = async (username: string, usertype: UserType) => {
     if (program && publicKey) {
       try {
         const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        const tx = await program.methods.setupUser(username)
+        console.log("user type is",`${usertype}`.toLowerCase())
+        const tx = await program.methods.setupUser(username,  { [`${usertype}`.toLowerCase()]: {}})
           .accounts({
             user: profilePda,
             authority: publicKey,
