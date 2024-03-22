@@ -11,9 +11,35 @@
       "name": "CASE_TAG",
       "type": "bytes",
       "value": "[67, 65, 83, 69, 95, 83, 84, 65, 84, 69]"
+    },
+    {
+      "name": "ADMIN_PUB_KEY",
+      "type": "bytes",
+      "value": "[54, 103, 72, 78, 100, 84, 89, 54, 74, 104, 66, 53, 120, 53, 83, 110, 65, 114, 103, 54, 88, 107, 111, 84, 78, 72, 55, 111, 110, 101, 55, 97, 85, 66, 121, 87, 121, 89, 87, 77, 50, 65, 74, 106]"
     }
   ],
   "instructions": [
+    {
+      "name": "verifyUser",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
     {
       "name": "setupUser",
       "accounts": [
@@ -37,6 +63,12 @@
         {
           "name": "username",
           "type": "string"
+        },
+        {
+          "name": "userType",
+          "type": {
+            "defined": "UserType"
+          }
         }
       ]
     },
@@ -206,12 +238,14 @@
             "type": "string"
           },
           {
-            "name": "casesCount",
-            "type": "u8"
+            "name": "typeOfUser",
+            "type": {
+              "defined": "UserType"
+            }
           },
           {
-            "name": "latestCase",
-            "type": "u8"
+            "name": "verified",
+            "type": "bool"
           }
         ]
       }
@@ -257,6 +291,26 @@
           }
         ]
       }
+    },
+    {
+      "name": "UserType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Admin"
+          },
+          {
+            "name": "Judge"
+          },
+          {
+            "name": "Lawyer"
+          },
+          {
+            "name": "Client"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -282,6 +336,6 @@
     }
   ],
   "metadata": {
-    "address": "5VtZR4MbaJb4iSY5rdvF8a3YdWECUNvvtajYrSJD1f9L"
+    "address": "9rR1HgxbpwuoATvj4QHjp7GcEiVG9dNbjciw4wW7TG2Z"
   }
 }
