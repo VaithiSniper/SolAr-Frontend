@@ -1,3 +1,4 @@
+// @ts-ignore
 import { addDocumentToDB, deleteDocumentFromDB, getDocumentsFromDB } from '@pages/appwrite'
 import type { UnverifiedJudges } from '@pages/appwrite'
 import type { NextApiRequest, NextApiResponse } from 'next'
