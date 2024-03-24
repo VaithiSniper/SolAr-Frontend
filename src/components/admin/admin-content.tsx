@@ -64,26 +64,30 @@ export const AdminContent = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((judge, index) => (
-                    <tr key={index}>
-                      <th></th>
-                      <td>{judge.address}</td>
-                      <td>{judge.name}</td>
-                      <td>{judge.email}</td>
-                      <td>
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => {
-                            const publicKey = new PublicKey(`${judge.address}`);
+                  {data &&
+                    data.length > 0 &&
+                    data.map((judge, index) => (
+                      <tr key={index}>
+                        <th></th>
+                        <td>{judge.address}</td>
+                        <td>{judge.name}</td>
+                        <td>{judge.email}</td>
+                        <td>
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => {
+                              const publicKey = new PublicKey(
+                                `${judge.address}`
+                              );
 
-                            verifyUser(publicKey);
-                          }}
-                        >
-                          Verify
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                              verifyUser(publicKey);
+                            }}
+                          >
+                            Verify
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
