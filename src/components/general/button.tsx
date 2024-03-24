@@ -6,7 +6,7 @@ export type ButtonState = "initial" | "loading" | "success" | "error";
 
 type Props = {
   state: ButtonState;
-  onClick: Function;
+  onClick: MouseEventHandler<HTMLButtonElement>;
   type?: "button" | "submit" | "reset";
   children: ReactNode;
   className?: string;
