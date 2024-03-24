@@ -102,6 +102,29 @@ export function useUser() {
     }
   }
 
+  const verifyUser = async (userAddress: anchor.web3.PublicKey) => {
+    if (program && publicKey) {
+      try {
+        const [userPda] = findProgramAddressSync([utf8.encode('USER_STATE'), userAddress.toBuffer()], program.programId)
+        const [adminPda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const tx = await program.methods.verifyUser()
+          .accounts({
+            admin: adminPda,
+            user: userPda,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully verified judge.')
+      } catch (err: any) {
+        console.log(err)
+        toast.error(err.toString())
+      }
+    }
+  }
+
+
+
+
   const initializeUserProfile = async (email: string, firstName: string, lastName: string, phone: string) => {
     if (program && publicKey) {
       try {
@@ -121,5 +144,5 @@ export function useUser() {
     }
   }
 
-  return { isExisitingUser, initializeUser, initializeUserProfile, loading, setLoading, user }
+  return { isExisitingUser, initializeUser, initializeUserProfile, loading, setLoading, user, verifyUser }
 }

@@ -45,7 +45,7 @@ export function LoginContent() {
 
     switch (tabIndex) {
       case 1:
-        setUserType("Judge" as UserType);
+        setUserType("Admin" as UserType);
         break;
       case 2:
         setUserType("Lawyer" as UserType);
@@ -127,7 +127,7 @@ export function LoginContent() {
                           isActive={activeTab === 1}
                           onClick={() => handleTabClick(1)}
                         >
-                          Judge
+                          Admin
                         </Tab>
                         <Tab
                           index={2}
