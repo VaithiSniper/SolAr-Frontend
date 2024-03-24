@@ -1,9 +1,16 @@
-import { Client, Databases, ID, Storage } from "appwrite";
+import { Client, Databases, ID, Query, Storage } from "appwrite";
 
-const appwriteEndpoint = process.env.APPWRITE_ENDPOINT || ""
-const appwriteProjectId = process.env.APPWRITE_PROJECT_ID || ""
-const appwriteDatabaseId = process.env.APPWRITE_DATABASE_ID || ""
-const storageBucketId = process.env.APPWRITE_STORAGE_ID || ""
+const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || ""
+const appwriteProjectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || ""
+const appwriteDatabaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || ""
+const appwriteStorageBucketId = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID || ""
+
+function renameFile(originalFile: File, newName: string) {
+  return new File([originalFile], newName, {
+    type: originalFile.type,
+    lastModified: originalFile.lastModified,
+  });
+}
 
 function getDatabaseInstance() {
   console.log(appwriteDatabaseId, appwriteEndpoint)
@@ -20,11 +27,12 @@ function getStorageInstance() {
   return new Storage(client);
 }
 
-async function addDocumentToStorage(document: any) {
+async function addDocumentToStorage(document: File, caseId: string) {
   const storage = getStorageInstance()
+  document = renameFile(document, `${caseId}|${document.name}`)
   try {
     await storage.createFile(
-      storageBucketId,
+      appwriteStorageBucketId,
       ID.unique(),
       document
     );
@@ -48,14 +56,19 @@ async function addDocumentToDB(collectionId: string, document: any) {
   }
 }
 
-async function getDocumentsFromDB(collectionId: string) {
+async function getDocumentMetadataFromDB(collectionId: string) {
   const db = getDatabaseInstance()
   return await db.listDocuments(appwriteDatabaseId, collectionId)
 }
 
+async function getFilesListFromStorageForCaseId(caseId: string) {
+  const storage = getStorageInstance()
+  return await storage.listFiles(appwriteStorageBucketId, [Query.startsWith("name", caseId)])
+}
+
 async function getDocumentsFromStorage(fileId: string) {
   const storage = getStorageInstance()
-  return await storage.getFile(storageBucketId, fileId);
+  return await storage.getFile(appwriteStorageBucketId, fileId);
 }
 
 async function deleteDocumentFromDB(collectionId: string, documentId: string) {
@@ -72,7 +85,7 @@ async function deleteDocumentFromDB(collectionId: string, documentId: string) {
 
 async function deleteDocumentFromStorage(fileId: string) {
   const storage = getStorageInstance()
-  return await storage.deleteFile(storageBucketId, fileId)
+  return await storage.deleteFile(appwriteStorageBucketId, fileId)
 }
 // Appwrite types
 // unverifiedJudges document
@@ -83,4 +96,4 @@ type UnverifiedJudges = {
 }
 
 export type { UnverifiedJudges }
-export { addDocumentToDB, getDocumentsFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, deleteDocumentFromStorage }
+export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }

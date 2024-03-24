@@ -6,6 +6,7 @@ import { UserProfile } from "src/hooks/userHooks";
 import Avatar from "../general/avatar";
 import { Button } from "../general/button";
 import QRCode from "react-qr-code";
+import Modal, { handleModal } from "@components/general/modal";
 
 export function ProfileContent() {
   // Router instance to navigate
@@ -52,11 +53,6 @@ export function ProfileContent() {
     }));
   };
 
-  const handleModal = () => {
-    const modal = document.getElementById("QRCodeModal") as (() => any);
-    modal.showModal()
-  }
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -72,22 +68,14 @@ export function ProfileContent() {
       <h1 className="text-center text-banner font-heading">
         Profile
       </h1>
-      <dialog id="QRCodeModal" className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
-          <QRCode
-            size={256}
-            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-            value={publicKey?.toString() || ""}
-            viewBox={`0 0 256 256`}
-          />
-          <div className="modal-action">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button className="btn bg-red-600 hover:bg-red-700 text-white">Close</button>
-            </form>
-          </div>
-        </div>
-      </dialog>
+      <Modal id="QRCodeModal">
+        <QRCode
+          size={256}
+          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+          value={publicKey?.toString() || ""}
+          viewBox={`0 0 256 256`}
+        />
+      </Modal>
       <div className="justify-center flex">
         <div className="card w-96 bg-base-100 shadow-xl">
           <div className="card-body">
@@ -124,7 +112,7 @@ export function ProfileContent() {
                     </>
                     :
                     <>
-                      <Button onClick={() => { }} state={publicKey ? "initial" : "loading"} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Show QR Code</Button>
+                      <Button onClick={() => { document.getElementById("QRCodeModal").showModal() }} state={publicKey ? "initial" : "loading"} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Show QR Code</Button>
                       <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(true)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Edit</Button>
                     </>
                 }

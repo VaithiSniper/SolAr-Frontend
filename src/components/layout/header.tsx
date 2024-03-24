@@ -37,7 +37,7 @@ export function Header() {
               width={50}
               height={50}
             ></Image>
-            <a className="btn btn-ghost text-xl">SolAr</a>
+            <span className="btn btn-ghost text-xl">SolAr</span>
           </Link>
         </div>
         <div>

@@ -1,4 +1,4 @@
-import { deleteDocumentFromStorage, getDocumentMetadataFromDB } from '@pages/appwrite'
+import { getFilesListFromStorageForCaseId } from '@pages/appwrite'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
@@ -12,19 +12,16 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     // Process a GET request
-    const documents = await getDocumentMetadataFromDB(req.body.fileId)
+    const caseId = req.query.caseId as string;
+    const documentsList = await getFilesListFromStorageForCaseId(caseId)
+    const truncatedDocumentList = documentsList.files.map((file) => ({
+      ...file,
+      name: file.name.split("|")[1]
+    }))
     res.json({
       status: 200,
       message: "Received GET request",
-      data: documents
-    })
-  }
-  else if (req.method === 'DELETE') {
-    // Process a DELETE request
-    const success = await deleteDocumentFromStorage(req.body.fileId)
-    res.json({
-      status: success ? 200 : 400,
-      message: "Received DELETE request",
+      data: truncatedDocumentList
     })
   }
   else {
