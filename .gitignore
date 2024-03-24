@@ -2,6 +2,9 @@
 # Ardrive Wallet file
 ardrive-wallet.json
 
+# ArDrive
+ardrive-wallet.json
+
 # dependencies
 /node_modules
 /.pnp

@@ -7,17 +7,23 @@ export type ButtonState = "initial" | "loading" | "success" | "error";
 type Props = {
   state: ButtonState;
   onClick: MouseEventHandler<HTMLButtonElement>;
+  type?: "button" | "submit" | "reset";
   children: ReactNode;
   className?: string;
 };
-export function Button({ state, onClick, children, className }: Props) {
+export function Button({ type, state, onClick, children, className }: Props) {
 
   const buttonClasses = classNames("btn", className);
+
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    onClick(event);
+  };
 
   return (
     <button
       className={buttonClasses}
-      onClick={onClick}
+      onClick={handleClick}
+      type={type}
       disabled={state === "loading"}
     >
       {children}

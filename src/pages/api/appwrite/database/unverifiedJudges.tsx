@@ -1,5 +1,5 @@
-import { addDocumentToDB, deleteDocumentFromDB, getDocumentsFromDB } from '@pages/appwrite'
-import type { UnverifiedJudges } from '@pages/appwrite'
+import { addDocumentToDB, deleteDocumentFromDB, getDocumentsFromDB } from '@utils/appwrite'
+import type { UnverifiedJudges } from '@utils/appwrite'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
