@@ -1,6 +1,5 @@
 import React from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -38,7 +37,7 @@ export function Header() {
               width={50}
               height={50}
             ></Image>
-            <a className="btn btn-ghost text-xl">SolAr</a>
+            <span className="btn btn-ghost text-xl">SolAr</span>
           </Link>
         </div>
         <div>
