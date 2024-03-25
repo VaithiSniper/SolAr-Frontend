@@ -14,7 +14,11 @@ export const config = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     // Process a POST request
-    const success = await addDocumentToDB('unverified-judges', req.body)
+    const payload = {
+      ...req.body,
+      address: req.body.address.toString()
+    }
+    const success = await addDocumentToDB('unverified-judges', payload)
     res.json({
       status: success ? 200 : 400,
       message: "Received POST request"

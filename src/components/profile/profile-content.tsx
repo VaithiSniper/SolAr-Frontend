@@ -7,6 +7,8 @@ import Avatar from "../general/avatar";
 import { Button } from "../general/button";
 import QRCode from "react-qr-code";
 import Modal, { handleModal } from "@components/general/modal";
+import { addDocumentToDB } from "@pages/appwrite";
+import { toast } from "react-hot-toast";
 
 export function ProfileContent() {
   // Router instance to navigate
@@ -62,6 +64,28 @@ export function ProfileContent() {
     // Now send tx to change the fields
   }
 
+  const handleSendVerification = async () => {
+    try {
+      const res = await fetch(`/api/appwrite/database/unverifiedJudges`, // TODO: Replace with caseId when available
+        {
+          method: "POST",
+          body: JSON.stringify({
+            address: publicKey,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      const data = await res.json();
+      toast.success("Sent request successfully!")
+    }
+    catch (err) {
+      toast.error(err.toString())
+    }
+  }
+
 
   return (
     <div className="text-white m-8 w-full justify-center">
@@ -78,6 +102,21 @@ export function ProfileContent() {
       </Modal>
       <div className="justify-center flex">
         <div className="card w-96 bg-base-100 shadow-xl">
+          {
+            !user.verified ?
+              (
+                <div className="stats bg-primary text-white text-center w-full">
+                  <div className="stat">
+                    <div className="stat-title text-white">You are not verified yet!</div>
+                    <div className="stat-actions">
+                      <button className="btn btn-lg btn-success" onClick={handleSendVerification}>Send request</button>
+                    </div>
+                  </div>
+                </div>
+              )
+              :
+              null
+          }
           <div className="card-body">
             <Avatar imageOrChar={userProfile.username.substring(0, 1)} />
             <form className="max-w-md mx-auto" onSubmit={(e) => { e.preventDefault() }}>

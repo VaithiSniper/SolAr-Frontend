@@ -18,6 +18,8 @@ export type UserProfile = {
   firstName: string;
   lastName: string;
   phone: string;
+  typeOfUser: UserType;
+  verified: boolean;
   latestCase: 0;
   casesCount: 0;
 }
@@ -31,6 +33,8 @@ export const initialDefaultUserProfile: UserProfile = {
   firstName: "",
   lastName: "",
   phone: "",
+  typeOfUser: { client: {} },
+  verified: false,
   latestCase: 0,
   casesCount: 0,
 }
@@ -84,8 +88,8 @@ export function useUser() {
     if (program && publicKey) {
       try {
         const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        console.log("user type is",`${usertype}`.toLowerCase())
-        const tx = await program.methods.setupUser(username,  { [`${usertype}`.toLowerCase()]: {}})
+        console.log("user type is", `${usertype}`.toLowerCase())
+        const tx = await program.methods.setupUser(username, { [`${usertype}`.toLowerCase()]: {} })
           .accounts({
             user: profilePda,
             authority: publicKey,
@@ -102,9 +106,20 @@ export function useUser() {
     }
   }
 
-  const verifyUser = async (userAddress: anchor.web3.PublicKey) => {
+  const verifyUser = async (docId: string, userAddress: anchor.web3.PublicKey) => {
     if (program && publicKey) {
       try {
+        // Off-chain verification
+        await fetch("/api/appwrite/database/unverifiedJudges", {
+          method: "DELETE",
+          body: JSON.stringify({
+            docId: docId
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        // On-chain verification
         const [userPda] = findProgramAddressSync([utf8.encode('USER_STATE'), userAddress.toBuffer()], program.programId)
         const [adminPda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
         const tx = await program.methods.verifyUser()

@@ -13,7 +13,6 @@ function renameFile(originalFile: File, newName: string) {
 }
 
 function getDatabaseInstance() {
-  console.log(appwriteDatabaseId, appwriteEndpoint)
   const client = new Client()
     .setEndpoint(appwriteEndpoint)
     .setProject(appwriteProjectId);
