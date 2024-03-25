@@ -13,6 +13,11 @@
       "value": "[67, 65, 83, 69, 95, 83, 84, 65, 84, 69]"
     },
     {
+      "name": "CASE_ID_TAG",
+      "type": "bytes",
+      "value": "[67, 65, 83, 69, 95, 73, 68, 95, 83, 84, 65, 84, 69]"
+    },
+    {
       "name": "PROSECUTOR_TAG",
       "type": "bytes",
       "value": "[80, 82, 79, 83, 69, 67, 85, 84, 79, 82, 95, 83, 84, 65, 84, 69]"
@@ -159,6 +164,11 @@
           "isSigner": false
         },
         {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "judge",
           "isMut": true,
           "isSigner": true
@@ -223,6 +233,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "id",
+            "type": "publicKey"
+          },
           {
             "name": "name",
             "type": "string"
@@ -298,6 +312,19 @@
           {
             "name": "verified",
             "type": "bool"
+          },
+          {
+            "name": "listOfCases",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "totalParticipatingCases",
+            "type": "u8"
           }
         ]
       }
@@ -415,6 +442,6 @@
     }
   ],
   "metadata": {
-    "address": "BKK8fPehHRYmffsxe4fVBWrXUPbaehXqmMGYAGZxXbKq"
+    "address": "agckAcPBjoKxQFVNT25DZcw96LgsyU7KrwNKTUFDHZX"
   }
 }
