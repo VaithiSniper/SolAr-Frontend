@@ -22,16 +22,11 @@ export function AdminLoginContent() {
 
   // Reset the state if wallet changes or disconnects
 
-  const { isExisitingUser, loading, setLoading, user, initializeUser } =
+  const { isExisitingUser, isAdminUser, loading, setLoading, user, initializeUser } =
     useUser();
 
-
-  useEffect(() => {
-    if (publicKey && publicKey.toString() === ADMIN_WALLET_PUBKEY) {
-      setIsAdmin(true)
-      router.push("/")
-    }
-  }, [publicKey])
+  if (isExisitingUser && !isAdminUser)
+    router.push("/")
 
   const [username, setUsername] = useState("");
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,8 +40,6 @@ export function AdminLoginContent() {
     await initializeUser(username, "Admin" as UserType);
   };
 
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
-
   return (
     <div className="text-white m-8 w-full justify-center">
       <h1 className="text-center text-banner font-heading">Admin Login</h1>
@@ -57,7 +50,7 @@ export function AdminLoginContent() {
               {
                 publicKey ?
                   (
-                    isAdmin ?
+                    isAdminUser ?
                       (
                         isExisitingUser ?
                           (

@@ -6,9 +6,10 @@ import { UserProfile } from "src/hooks/userHooks";
 import Avatar from "../general/avatar";
 import { Button } from "../general/button";
 import QRCode from "react-qr-code";
-import Modal, { handleModal } from "@components/general/modal";
+import Modal from "@components/general/modal";
 import { addDocumentToDB } from "@pages/appwrite";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
 
 export function ProfileContent() {
   // Router instance to navigate
@@ -66,6 +67,7 @@ export function ProfileContent() {
 
   const handleSendVerification = async () => {
     try {
+      setLoading(true)
       const res = await fetch(`/api/appwrite/database/unverifiedJudges`, // TODO: Replace with caseId when available
         {
           method: "POST",
@@ -78,10 +80,9 @@ export function ProfileContent() {
             "Content-Type": "application/json",
           },
         });
-      const data = await res.json();
       toast.success("Sent request successfully!")
     }
-    catch (err) {
+    catch (err: any) {
       toast.error(err.toString())
     }
   }
@@ -109,7 +110,7 @@ export function ProfileContent() {
                   <div className="stat">
                     <div className="stat-title text-white">You are not verified yet!</div>
                     <div className="stat-actions">
-                      <button className="btn btn-lg btn-success" onClick={handleSendVerification}>Send request</button>
+                      <Button className="btn btn-lg btn-success" onClick={handleSendVerification} state={loading ? "loading" : "initial"}>Send request</Button>
                     </div>
                   </div>
                 </div>
@@ -118,6 +119,16 @@ export function ProfileContent() {
               null
           }
           <div className="card-body">
+            {
+              user.verified ?
+                <div className="bg-primary p-1 rounded-full self-end">
+                  <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 48 48">
+                    <path fill="#c8e6c9" d="M44,24c0,11-9,20-20,20S4,35,4,24S13,4,24,4S44,13,44,24z"></path><polyline fill="none" stroke="#4caf50" stroke-miterlimit="10" stroke-width="4" points="14,24 21,31 36,16"></polyline>
+                  </svg>
+                </div>
+                :
+                null
+            }
             <Avatar imageOrChar={userProfile.username.substring(0, 1)} />
             <form className="max-w-md mx-auto" onSubmit={(e) => { e.preventDefault() }}>
               <div className="relative z-0 w-full mb-5 group">

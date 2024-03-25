@@ -60,6 +60,9 @@ export function useUser() {
   }, [connection, anchorWallet])
 
   useEffect(() => {
+  }, [publicKey])
+
+  useEffect(() => {
     const checkUserExists = async () => {
       if (program && publicKey) {
         try {
@@ -69,8 +72,6 @@ export function useUser() {
           console.log('user account is', userAccount)
           if (userAccount) {
             setIsExistingUser(true)
-            if (publicKey.toString() === ADMIN_WALLET_PUBKEY)
-              setIsAdminUser(true)
             delete userAccount.authority
             console.log(userAccount)
             setUser(userAccount)
@@ -85,6 +86,11 @@ export function useUser() {
         }
       }
     }
+    const checkForAdminUser = () => {
+      if (publicKey && (publicKey.toString() === ADMIN_WALLET_PUBKEY))
+        setIsAdminUser(true)
+    }
+    checkForAdminUser()
     checkUserExists()
   }, [publicKey, program])
 

@@ -17,7 +17,10 @@ export const AdminContent = () => {
   // Hook for setting the judge state from the API
   const [data, setData] = useState<JudgeData[]>([]);
 
-  const { verifyUser, loading, setLoading, isAdminUser } = useUser();
+  const { verifyUser, loading, setLoading, isAdminUser, isExisitingUser } = useUser();
+
+  if (isExisitingUser && !isAdminUser)
+    router.push("/")
 
   const [isUserVerified, setIsUserVerified] = useState<boolean>(false)
 

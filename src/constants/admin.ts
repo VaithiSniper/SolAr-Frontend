@@ -1,1 +1,1 @@
-export const ADMIN_WALLET_PUBKEY = "DYGme3V738TiwLKwvpdLQCbk1CKrwdhwMedLVtDZFPnf"
+export const ADMIN_WALLET_PUBKEY = "6gHNdTY6JhB5x5SnArg6XkoTNH7one7aUByWyYWM2AJj"

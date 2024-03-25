@@ -13,6 +13,16 @@
       "value": "[67, 65, 83, 69, 95, 83, 84, 65, 84, 69]"
     },
     {
+      "name": "PROSECUTOR_TAG",
+      "type": "bytes",
+      "value": "[80, 82, 79, 83, 69, 67, 85, 84, 79, 82, 95, 83, 84, 65, 84, 69]"
+    },
+    {
+      "name": "DEFENDANT_TAG",
+      "type": "bytes",
+      "value": "[68, 69, 70, 69, 78, 68, 65, 78, 84, 95, 83, 84, 65, 84, 69]"
+    },
+    {
       "name": "ADMIN_PUB_KEY",
       "type": "bytes",
       "value": "[54, 103, 72, 78, 100, 84, 89, 54, 74, 104, 66, 53, 120, 53, 83, 110, 65, 114, 103, 54, 88, 107, 111, 84, 78, 72, 55, 111, 110, 101, 55, 97, 85, 66, 121, 87, 121, 89, 87, 77, 50, 65, 74, 106]"
@@ -131,12 +141,43 @@
       ],
       "args": [
         {
-          "name": "parties",
+          "name": "judge",
+          "type": "publicKey"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "addMemberToParty",
+      "accounts": [
+        {
+          "name": "case",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "judge",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "member",
+          "type": "publicKey"
+        },
+        {
+          "name": "partyType",
           "type": {
-            "array": [
-              "publicKey",
-              2
-            ]
+            "defined": "PartyType"
           }
         }
       ]
@@ -153,7 +194,7 @@
       "args": [
         {
           "name": "party",
-          "type": "publicKey"
+          "type": "bool"
         }
       ]
     },
@@ -183,19 +224,30 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "parties",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "judge",
+            "type": "publicKey"
+          },
+          {
+            "name": "prosecutor",
             "type": {
-              "array": [
-                "publicKey",
-                2
-              ]
+              "defined": "Party"
+            }
+          },
+          {
+            "name": "defendant",
+            "type": {
+              "defined": "Party"
             }
           },
           {
             "name": "caseWinner",
             "type": {
               "option": {
-                "defined": "Winner"
+                "defined": "PartyType"
               }
             }
           },
@@ -253,7 +305,34 @@
   ],
   "types": [
     {
-      "name": "Winner",
+      "name": "Party",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "typeOfParty",
+            "type": {
+              "defined": "PartyType"
+            }
+          },
+          {
+            "name": "members",
+            "type": {
+              "array": [
+                "publicKey",
+                5
+              ]
+            }
+          },
+          {
+            "name": "size",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PartyType",
       "type": {
         "kind": "enum",
         "variants": [
@@ -336,6 +415,6 @@
     }
   ],
   "metadata": {
-    "address": "8ZSBKnPGF9w6y9EvUCJASmzF6V2dmTmfEXxfFWFWk7dX"
+    "address": "BKK8fPehHRYmffsxe4fVBWrXUPbaehXqmMGYAGZxXbKq"
   }
 }
