@@ -23,7 +23,7 @@ export function Header() {
 
   const { publicKey } = useWallet();
 
-  const { isExisitingUser, loading, setLoading, user, initializeUserProfile } =
+  const { isAdminUser, isExisitingUser, loading, setLoading, user, initializeUserProfile } =
     useUser();
 
   return (
@@ -75,30 +75,15 @@ export function Header() {
               </div>
             </Link>
           ) : (
-            isAdmin ?
-              (
-                <Link href="/login">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
-                  >
-                    Login
-                  </div>
-                </Link>
-              )
-              :
-              (
-                <Link href="/login">
-                  <div
-                    tabIndex={0}
-                    role="button"
-                    className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
-                  >
-                    Login
-                  </div>
-                </Link>
-              )
+            <Link href={isAdminUser ? "/admin/login" : "/login"}>
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
+              >
+                Login
+              </div>
+            </Link>
           )}
         </div>
       </div>
