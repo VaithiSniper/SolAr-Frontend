@@ -1,0 +1,1 @@
+export const ADMIN_WALLET_PUBKEY = "DYGme3V738TiwLKwvpdLQCbk1CKrwdhwMedLVtDZFPnf"

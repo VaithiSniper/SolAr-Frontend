@@ -1,5 +1,5 @@
 // @ts-ignore
-import { addDocumentToDB, deleteDocumentFromDB, getDocumentsFromDB } from '@pages/appwrite'
+import { addDocumentToDB, deleteDocumentFromDB, getDocumentMetadataFromDB } from '@pages/appwrite'
 import type { UnverifiedJudges } from '@pages/appwrite'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   else if (req.method === 'GET') {
     // Process a GET request
-    const documents = await getDocumentsFromDB('unverified-judges')
+    const documents = await getDocumentMetadataFromDB('unverified-judges')
     res.json({
       status: 200,
       message: "Received GET request",
