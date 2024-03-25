@@ -1,9 +1,7 @@
 import { useRouter } from "next/router";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useUser } from "src/hooks/userHooks";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import { ADMIN_WALLET_PUBKEY } from "src/constants/admin";
+import React, { useEffect, useState } from "react";
+import { PublicKey } from "@solana/web3.js";
 import { Button } from "@components/general/button";
 
 type JudgeData = {
@@ -16,26 +14,10 @@ type JudgeData = {
 export const AdminContent = () => {
   const router = useRouter();
 
-  //hook for setting the judge state from the API
+  // Hook for setting the judge state from the API
   const [data, setData] = useState<JudgeData[]>([]);
 
-  const { publicKey } = useWallet();
-
-  const [isAdmin, setIsAdmin] = useState<boolean>(false)
-
-  useEffect(() => {
-    if (publicKey) {
-      if (publicKey.toString() === ADMIN_WALLET_PUBKEY) {
-        setIsAdmin(true)
-      }
-      else {
-        setIsAdmin(false)
-        router.push("/")
-      }
-    }
-  }, [publicKey])
-
-  const { verifyUser, loading, setLoading } = useUser();
+  const { verifyUser, loading, setLoading, isAdminUser } = useUser();
 
   const [isUserVerified, setIsUserVerified] = useState<boolean>(false)
 
@@ -64,7 +46,7 @@ export const AdminContent = () => {
   return (
     <>
       {
-        isAdmin ?
+        isAdminUser ?
           (
             <div className="flex flex-col w-full h-full text-white" >
               <div className="flex flex-row items-center justify-center w-full h-full">
@@ -124,7 +106,6 @@ export const AdminContent = () => {
                 </div>
               </div>
             </div >
-
           )
           :
           <div className="text-2xl text-white mt-4 align-middle">You are not authorized to access this!</div>

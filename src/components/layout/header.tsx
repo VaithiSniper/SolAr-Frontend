@@ -75,15 +75,30 @@ export function Header() {
               </div>
             </Link>
           ) : (
-            <Link href="/login">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
-              >
-                Login
-              </div>
-            </Link>
+            isAdmin ?
+              (
+                <Link href="/login">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
+                  >
+                    Login
+                  </div>
+                </Link>
+              )
+              :
+              (
+                <Link href="/login">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
+                  >
+                    Login
+                  </div>
+                </Link>
+              )
           )}
         </div>
       </div>

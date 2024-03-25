@@ -8,6 +8,7 @@ import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pub
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
 
 import { Solar } from 'src/constants/solar'
+import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
 
 export type UserType = anchor.IdlTypes<Solar>["UserType"];
 
@@ -45,6 +46,7 @@ export function useUser() {
   const anchorWallet = useAnchorWallet()
 
   const [isExisitingUser, setIsExistingUser] = useState(false)
+  const [isAdminUser, setIsAdminUser] = useState(false)
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState<UserProfile>(initialDefaultUserProfile)
 
@@ -67,6 +69,8 @@ export function useUser() {
           console.log('user account is', userAccount)
           if (userAccount) {
             setIsExistingUser(true)
+            if (publicKey.toString() === ADMIN_WALLET_PUBKEY)
+              setIsAdminUser(true)
             delete userAccount.authority
             console.log(userAccount)
             setUser(userAccount)
@@ -159,5 +163,5 @@ export function useUser() {
     }
   }
 
-  return { isExisitingUser, initializeUser, initializeUserProfile, loading, setLoading, user, verifyUser }
+  return { isExisitingUser, isAdminUser, initializeUser, initializeUserProfile, loading, setLoading, user, verifyUser }
 }
