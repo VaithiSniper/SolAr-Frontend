@@ -34,7 +34,7 @@ export default function CaseViewPage() {
 
   const { setLoading } = useUser()
 
-  const [documents, setDocuments] = useState()
+  const [documents, setDocuments] = useState<any>()
 
   useEffect(() => {
     const fetchCases = async () => {
@@ -54,8 +54,11 @@ export default function CaseViewPage() {
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files[0] as File
-    setUploadedFile(file);
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0] as File
+      setUploadedFile(file);
+    }
+    return
   };
 
   const handleUpload = async (e: FormEvent) => {
@@ -94,12 +97,12 @@ export default function CaseViewPage() {
             <div className=" text-4xl ">{router.query.caseId}</div>
             <Button state="initial" onClick={() => { setHasUploadedImage(false); document.getElementById("FileUploadModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-white" >Upload documents +</Button>
           </div>
-          <Button state="initial" onClick={handleUpload} className="mx-4 mt-2 flex flex-col justify-center align-middle bg-fuchsia-400 hover:bg-fuchsia-600 text-white"><svg style={{ color: "white" }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bell-fill" viewBox="0 0 16 16"> <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" fill="white"></path> </svg></Button>
+          <Button state="initial" onClick={handleUpload} className="mx-4 mt-2 flex flex-col justify-center align-middle bg-fuchsia-400 hover:bg-fuchsia-600 text-white"><svg style={{ color: "white" }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-bell-fill" viewBox="0 0 16 16"> <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" fill="white"></path> </svg></Button>
         </div>
         <div className="flex flex-row">
           <div className="grid grid-cols-4 col-span-4 h-2/5 gap-12 mt-4 p-2 w-3/4">
             {
-              documents ?
+              documents && documents.length > 0 ?
                 documents.map((file) => <FileCardComponent caseId={router.query.caseId as string} fileName={file.name} fileId={file.name} />)
                 :
                 <h1 className="text-banner font-heading text-white">No files present</h1>
