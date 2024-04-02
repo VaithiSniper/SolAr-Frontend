@@ -29,8 +29,8 @@
     },
     {
       "name": "ADMIN_PUB_KEY",
-      "type": "bytes",
-      "value": "[54, 103, 72, 78, 100, 84, 89, 54, 74, 104, 66, 53, 120, 53, 83, 110, 65, 114, 103, 54, 88, 107, 111, 84, 78, 72, 55, 111, 110, 101, 55, 97, 85, 66, 121, 87, 121, 89, 87, 77, 50, 65, 74, 106]"
+      "type": "publicKey",
+      "value": "solana_program :: pubkey ! (\"6gHNdTY6JhB5x5SnArg6XkoTNH7one7aUByWyYWM2AJj\")"
     }
   ],
   "instructions": [
@@ -170,8 +170,8 @@
         },
         {
           "name": "judge",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -199,6 +199,11 @@
           "name": "case",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "judge",
+          "isMut": true,
+          "isSigner": false
         }
       ],
       "args": [
@@ -214,6 +219,11 @@
         {
           "name": "case",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "judge",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -359,6 +369,40 @@
       }
     },
     {
+      "name": "UnauthorizedError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotAdmin"
+          },
+          {
+            "name": "NotJudge"
+          },
+          {
+            "name": "NotLawyer"
+          },
+          {
+            "name": "NotClient"
+          },
+          {
+            "name": "NoOwnershipOverAccount"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AlreadyVerified"
+          }
+        ]
+      }
+    },
+    {
       "name": "PartyType",
       "type": {
         "kind": "enum",
@@ -442,6 +486,6 @@
     }
   ],
   "metadata": {
-    "address": "agckAcPBjoKxQFVNT25DZcw96LgsyU7KrwNKTUFDHZX"
+    "address": "9ZmuZZ7ztT8fUsKne5AJA3QGzS4LEduLypg5axxJEEGY"
   }
 }

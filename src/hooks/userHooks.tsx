@@ -119,16 +119,6 @@ export function useUser() {
   const verifyUser = async (docId: string, userAddress: anchor.web3.PublicKey) => {
     if (program && publicKey) {
       try {
-        // Off-chain verification
-        await fetch("/api/appwrite/database/unverifiedJudges", {
-          method: "DELETE",
-          body: JSON.stringify({
-            docId: docId
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
         // On-chain verification
         const [userPda] = findProgramAddressSync([utf8.encode('USER_STATE'), userAddress.toBuffer()], program.programId)
         const [adminPda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
@@ -139,6 +129,17 @@ export function useUser() {
             systemProgram: SystemProgram.programId,
           })
           .rpc()
+        // Off-chain verification
+        await fetch("/api/appwrite/database/unverifiedJudges", {
+          method: "DELETE",
+          body: JSON.stringify({
+            docId: docId
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
         toast.success('Successfully verified judge.')
       } catch (err: any) {
         console.log(err)

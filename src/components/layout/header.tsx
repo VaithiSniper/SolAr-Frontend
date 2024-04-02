@@ -13,8 +13,8 @@ export function Header() {
   const route = useRouter();
   const path = route.pathname;
 
-  const currentPathStyles = "mx-4 underline";
-  const defaultStyles = "mx-4";
+  const currentPathStyles = "mx-4 underline text-white";
+  const defaultStyles = "mx-4 text-[#777576] hover:text-white";
   const { connected, wallets } = useWallet();
   const data: navLink[] = [
     { label: "Link1", link: "/link1" },
@@ -28,7 +28,7 @@ export function Header() {
 
   return (
     <>
-      <div className="navbar bg-base-100 flex flex-row justify-between">
+      <div className="navbar bg-[#0B0708] pt-4 flex flex-row justify-between hover:text-white">
         <div>
           <Link className="flex flex-row" href="/">
             <Image
@@ -37,7 +37,7 @@ export function Header() {
               width={50}
               height={50}
             ></Image>
-            <span className="btn btn-ghost text-xl">SolAr</span>
+            <span className="btn btn-ghost text-xl text-white">SolAr</span>
           </Link>
         </div>
         <div>

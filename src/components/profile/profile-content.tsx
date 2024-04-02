@@ -10,6 +10,7 @@ import Modal from "@components/general/modal";
 import { addDocumentToDB } from "@pages/appwrite";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
+import type { UserType } from "src/hooks/userHooks";
 
 export function ProfileContent() {
   // Router instance to navigate
@@ -33,6 +34,27 @@ export function ProfileContent() {
   const [isEditing, setIsEditing] = useState(false)
 
   const [userProfile, setUserProfile] = useState<UserProfile>(initialDefaultUserProfile)
+
+  const [hasSentRequest, setHasSentRequest] = useState<boolean>(false)
+
+  React.useEffect(() => {
+    const fetchJudges = async () => {
+      const res = await fetch("/api/appwrite/database/unverifiedJudges", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      const status = data.data.documents.find((judge) => {
+        judge.username === user.username
+      })
+      setHasSentRequest((status !== undefined) ? false : true)
+    };
+
+    fetchJudges();
+  }, [hasSentRequest]);
+
 
   React.useEffect(() => {
     if (user || isExisitingUser) {
@@ -104,7 +126,7 @@ export function ProfileContent() {
       <div className="justify-center flex">
         <div className="card w-96 bg-base-100 shadow-xl">
           {
-            !user.verified ?
+            !hasSentRequest && !user.verified && user.typeOfUser.judge ?
               (
                 <div className="stats bg-primary text-white text-center w-full">
                   <div className="stat">
