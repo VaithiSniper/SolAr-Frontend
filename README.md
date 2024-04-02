@@ -20,4 +20,7 @@ This project uses **Next.js, ChakraUI, TailwindCSS, Anchor** and **Solana SDKs**
 
 ## Screenshots
 #### Homepage
-![image](https://github.com/VaithiSniper/sui-place/assets/58522375/9ba57156-757b-46c5-9b42-8c8e95cea217)
+![image](https://github.com/VaithiSniper/SolAr-Frontend/assets/58522375/b849fcdd-f11a-488d-bccc-b6b841826a73)
+
+#### Profile
+![Screenshot 2024-04-03 at 00-42-14 SolAr Profile](https://github.com/VaithiSniper/SolAr-Frontend/assets/58522375/a15f00fe-f0da-444c-8ad9-c8dac885bb5c)
