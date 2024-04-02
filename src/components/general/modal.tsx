@@ -2,8 +2,8 @@ import { MouseEventHandler, ReactElement } from "react";
 
 export default function Modal({ id, children }: { id: string, children: ReactElement }) {
   return (
-    <dialog id={id} className="modal modal-bottom sm:modal-middle">
-      <div className="modal-box">
+    <dialog id={id} className="bg-[#0B0708] modal modal-bottom sm:modal-middle">
+      <div className="modal-box bg-[#0B0708] border-white border shadow-lg shadow-fuchsia-400">
         {children}
         <div className="modal-action">
           <form method="dialog">

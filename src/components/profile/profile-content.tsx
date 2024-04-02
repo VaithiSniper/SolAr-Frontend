@@ -124,7 +124,7 @@ export function ProfileContent() {
         />
       </Modal>
       <div className="justify-center flex">
-        <div className="card w-96 bg-base-100 shadow-xl">
+        <div className="card w-96 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400">
           {
             !hasSentRequest && !user.verified && user.typeOfUser.judge ?
               (
