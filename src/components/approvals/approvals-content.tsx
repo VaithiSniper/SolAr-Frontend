@@ -77,13 +77,14 @@ export const AdminApprovalsContent = () => {
                             </th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>
-                              Verify
-                            </th>
+                            {
+                              selectedUnverifiedTab && <th>Verify</th>
+                            }
                           </tr>
                         </thead>
                         <tbody>
-                          {data &&
+                          {
+                            data &&
                             data.length > 0 &&
                             data.map((judge, index) => (
                               <tr key={index}>
@@ -91,24 +92,28 @@ export const AdminApprovalsContent = () => {
                                 <td>{judge.name}</td>
                                 <td>{judge.email}</td>
                                 <td hidden={true}>{judge.docId}</td>
-                                <td>
-                                  <Button
-                                    state={loading ? "loading" : "initial"}
-                                    className="btn btn-primary"
-                                    onClick={async () => {
-                                      const publicKey = new PublicKey(
-                                        `${judge.address}`
-                                      );
-                                      setLoading(true)
-                                      await verifyUser(judge.docId, publicKey);
-                                      setIsUserVerified(true)
-                                    }}
-                                  >
-                                    Verify
-                                  </Button>
-                                </td>
+                                {
+                                  selectedUnverifiedTab &&
+                                  <td>
+                                    <Button
+                                      state={loading ? "loading" : "initial"}
+                                      className="btn btn-primary"
+                                      onClick={async () => {
+                                        const publicKey = new PublicKey(
+                                          `${judge.address}`
+                                        );
+                                        setLoading(true)
+                                        await verifyUser(judge.docId, publicKey);
+                                        setIsUserVerified(true)
+                                      }}
+                                    >
+                                      Verify
+                                    </Button>
+                                  </td>
+                                }
                               </tr>
-                            ))}
+                            ))
+                          }
                         </tbody>
                       </table>
                     </div>

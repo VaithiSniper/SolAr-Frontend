@@ -10,43 +10,50 @@ import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapte
 import { Solar } from 'src/constants/solar'
 import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
 
-export type UserType = anchor.IdlTypes<Solar>["UserType"];
-
-
-export type UserProfile = {
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  typeOfUser: UserType;
-  verified: boolean;
-  latestCase: 0;
-  casesCount: 0;
+export type CaseState = anchor.IdlTypes<Solar>["CaseState"]
+export type PartyType = anchor.IdlTypes<Solar>["Winner"]
+export type Winner = anchor.IdlTypes<Solar>["Winner"]
+export type CaseAccount = anchor.IdlAccounts<Solar>["case"]
+export type Party = {
+  type_of_party: PartyType,
+  members: [PublicKey?],
+  size: number,
 }
-export interface UserProfileAccount extends UserProfile {
-  authority?: PublicKey;
-}
-
-export const initialDefaultUserProfile: UserProfile = {
-  username: "",
-  email: "",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  typeOfUser: { client: {} },
-  verified: false,
-  latestCase: 0,
-  casesCount: 0,
+export type Case = {
+  id: PublicKey,
+  name: string,
+  judge: PublicKey,
+  prosecutor: Party,
+  defendant: Party,
+  caseWinner: null | Winner,
+  caseState: CaseState
 }
 
-export function useUser() {
+export const initialDefaultCase: Case = {
+  id: new PublicKey(""),
+  name: "",
+  judge: new PublicKey(""),
+  prosecutor: {
+    type_of_party: "Prosecutor" as PartyType,
+    members: [],
+    size: 0
+  },
+  defendant: {
+    type_of_party: "Defendant" as PartyType,
+    members: [],
+    size: 0
+  },
+  caseWinner: "Defendant" as PartyType,
+  caseState: "ToStart" as CaseState,
+}
+
+export function useCase() {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
   const anchorWallet = useAnchorWallet()
 
   const [loading, setLoading] = useState(false)
-  const [cases, setCases] = useState<UserProfile>(initialDefaultUserProfile)
+  const [cases, setCases] = useState<Case>(initialDefaultCase)
 
   const program = useMemo(() => {
     if (anchorWallet) {

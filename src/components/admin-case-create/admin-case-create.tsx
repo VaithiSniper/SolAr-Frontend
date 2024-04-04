@@ -14,8 +14,7 @@ export const AdminCaseCreate = () => {
 
   const [verifiedJugesList, setVerifiedJudgesList] = useState<VerifiedJudgeOption[]>()
 
-  const [casename, setCasename] = useState<string>()
-  const [presidingJudge, setPresidingJudge] = useState<string>()
+  const [caseState, setCaseState] = useState<VerifiedJudgeOption>()
 
   const { loading, setLoading, isAdminUser, isExisitingUser } = useUser();
 
@@ -40,13 +39,21 @@ export const AdminCaseCreate = () => {
     fetchJudges()
   }, [verifiedJugesList])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCasename(e.target.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    console.log(name, value)
+    setCaseState((prevValue) => (
+      {
+        ...prevValue,
+        [name]: value
+      }
+    ));
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log(caseState)
   };
 
 
@@ -72,16 +79,16 @@ export const AdminCaseCreate = () => {
                             <div className="relative z-0 w-full mb-5 group">
                               <input
                                 type="text"
-                                name="casename"
+                                name="name"
                                 id="casename"
-                                value={casename}
+                                value={caseState?.name}
                                 onChange={handleChange}
                                 className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                 placeholder=" "
                                 required
                               />
                               <label
-                                htmlFor="username"
+                                htmlFor="casename"
                                 className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                               >
                                 Case Name
@@ -97,13 +104,13 @@ export const AdminCaseCreate = () => {
                               Presiding Judge
                             </label>
                             <div className="relative z-0 w-full mb-5 group">
-                              <select id="presidingJudge" className="select select-bordered w-full max-w-xs">
+                              <select onChange={handleChange} name="address" id="presidingJudge" className="select select-bordered w-full max-w-xs">
                                 <>
                                   <option selected disabled>Choose presiding judge</option>
                                   {
                                     verifiedJugesList && verifiedJugesList.length > 0 &&
                                     verifiedJugesList.map(({ name, address }: { address: string, name: string }) =>
-                                      <option value={address} title={address}>{name}</option>
+                                      <option key={address} value={address} title={address}>{name}</option>
                                     )
                                   }
                                 </>
