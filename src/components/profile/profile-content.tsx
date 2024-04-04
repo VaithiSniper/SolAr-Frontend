@@ -46,10 +46,10 @@ export function ProfileContent() {
         },
       });
       const data = await res.json();
-      const status = data.data.documents.find((judge) => {
-        judge.username === user.username
-      })
-      setHasSentRequest((status !== undefined) ? false : true)
+      console.log("DEBYG", data.data.documents[0])
+      const status = data.data.documents.find((judge: any) => (judge.email === user.email))
+      console.log("DEBYG", status)
+      setHasSentRequest((status !== undefined) ? true : false)
     };
 
     fetchJudges();
@@ -128,7 +128,7 @@ export function ProfileContent() {
           {
             !hasSentRequest && !user.verified && user.typeOfUser.judge ?
               (
-                <div className="stats bg-primary text-white text-center w-full">
+                <div className="stats bg-primary text-white text-center w-full shadow-md shadow-fuchsia-400">
                   <div className="stat">
                     <div className="stat-title text-white">You are not verified yet!</div>
                     <div className="stat-actions">

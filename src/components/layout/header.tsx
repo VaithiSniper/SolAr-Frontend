@@ -46,18 +46,47 @@ export function Header() {
         </div>
         <div>
           {/* links that should be accessible only after logging in */}
-          {publicKey ? (
-            <>
-              <Link
-                className={
-                  path.includes("/myCases") ? currentPathStyles : defaultStyles
-                }
-                href="/myCases"
-              >
-                My Cases
-              </Link>
-            </>
-          ) : null}
+          {
+            publicKey ?
+              (
+                isAdminUser ?
+                  (
+                    <>
+                      <Link
+                        className={
+                          path.includes("/approvals") ? currentPathStyles : defaultStyles
+                        }
+                        href="/admin/approvals"
+                      >
+                        Approvals
+                      </Link>
+                      <Link
+                        className={
+                          path.includes("/case/create") ? currentPathStyles : defaultStyles
+                        }
+                        href="/admin/case/create"
+                      >
+                        Create Case
+                      </Link>
+                    </>
+                  )
+                  :
+                  (
+                    <>
+                      <Link
+                        className={
+                          path.includes("/myCases") ? currentPathStyles : defaultStyles
+                        }
+                        href="/myCases"
+                      >
+                        My Cases
+                      </Link>
+                    </>
+                  )
+              )
+              :
+              null
+          }
           {/* login or profile button is always displayed */}
           {publicKey && isExisitingUser ? (
             <>

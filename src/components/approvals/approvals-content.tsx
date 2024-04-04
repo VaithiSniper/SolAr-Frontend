@@ -11,11 +11,15 @@ type JudgeData = {
   address: string;
 };
 
-export const AdminContent = () => {
+export const AdminApprovalsContent = () => {
   const router = useRouter();
 
   // Hook for setting the judge state from the API
   const [data, setData] = useState<JudgeData[]>([]);
+
+  const [selectedUnverifiedTab, setSelectedUnverifiedTab] = useState<boolean>(true);
+  const inactiveTabStyles = "tab text-white text-md"
+  const activeTabStyles = "tab text-white text-md tab-active"
 
   const { verifyUser, loading, setLoading, isAdminUser, isExisitingUser } = useUser();
 
@@ -26,14 +30,15 @@ export const AdminContent = () => {
 
   useEffect(() => {
     const fetchJudges = async () => {
-      const res = await fetch("/api/appwrite/database/unverifiedJudges", {
+      const typeOfJudgesToQuery = selectedUnverifiedTab ? "unverifiedJudges" : "verifiedJudges"
+      const res = await fetch(`/api/appwrite/database/${typeOfJudgesToQuery}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
       const data = await res.json();
-      const dataToSet: any = data.data.documents.map(judge => ({
+      const dataToSet: any = data.data.documents.map((judge: any) => ({
         ...judge,
         docId: judge["$id"]
       }))
@@ -44,7 +49,7 @@ export const AdminContent = () => {
     };
 
     fetchJudges();
-  }, [isUserVerified]);
+  }, [selectedUnverifiedTab, isUserVerified]);
 
   return (
     <>
@@ -53,24 +58,26 @@ export const AdminContent = () => {
           (
             <div className="flex flex-col w-full h-full text-white" >
               <div className="flex flex-row items-center justify-center w-full h-full">
-                <h1 className="text-5xl font-bold text-center font-heading mt-4">Admin Dashboard</h1>
+                <h1 className="text-5xl font-bold text-center font-heading mt-4">Approvals</h1>
               </div>
-
+              <div role="tablist" className="tabs tabs-boxed bg-[#0B0708] border-white border w-1/2 mx-auto my-4 font-bold">
+                <button role="tab" className={selectedUnverifiedTab ? activeTabStyles : inactiveTabStyles} onClick={() => { setSelectedUnverifiedTab(true) }}>Pending</button>
+                <button role="tab" className={!selectedUnverifiedTab ? activeTabStyles : inactiveTabStyles} onClick={() => { setSelectedUnverifiedTab(false) }}>Completed</button>
+              </div>
               <div className="ml-10 mr-10">
-                <h2 className="text-3xl mt-10 justify-start">Pending verifications</h2>
-                <div className="card mt-10 px-10 bg-slate-400 text-primary-content">
+                <div className="card mt-10 px-10 bg-[#0B0708] border-white border shadow-lg shadow-fuchsia-400 text-white">
                   <div className="card-body">
                     <div className="overflow-x-auto">
                       <table className="table">
                         {/* head */}
                         <thead>
-                          <tr>
-                            <th className=" text-xl font-mono text-slate-700">
+                          <tr className="text-xl font-mono text-white">
+                            <th>
                               Address
                             </th>
-                            <th className=" text-xl font-mono text-slate-700">Name</th>
-                            <th className=" text-xl font-mono text-slate-700">Email</th>
-                            <th className=" text-xl font-mono text-slate-700">
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>
                               Verify
                             </th>
                           </tr>

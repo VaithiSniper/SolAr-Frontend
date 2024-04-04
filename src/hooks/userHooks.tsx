@@ -139,7 +139,18 @@ export function useUser() {
             "Content-Type": "application/json",
           },
         });
-
+        //Off-chain addition
+        await fetch("/api/appwrite/database/verifiedJudges", {
+          method: "POST",
+          body: JSON.stringify({
+            address: publicKey,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         toast.success('Successfully verified judge.')
       } catch (err: any) {
         console.log(err)
