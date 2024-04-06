@@ -1,6 +1,7 @@
 import CaseCardComponent from "@components/case/CaseCard"
 import type { CaseCard } from "@components/case/CaseCard"
 import { CaseState } from "@components/case/CaseCard"
+import { useCase } from "src/hooks/caseHooks"
 
 const lawsuits: CaseCard[] = [
   {
@@ -14,6 +15,9 @@ const lawsuits: CaseCard[] = [
 ]
 
 export default function UserCasesViewPage() {
+
+  const { cases } = useCase()
+  console.log(cases)
 
   return (
     <>

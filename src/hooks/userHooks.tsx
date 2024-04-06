@@ -9,9 +9,11 @@ import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapte
 
 import { Solar } from 'src/constants/solar'
 import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
+import { useCase } from './caseHooks'
+
+export const initialFixedPubkey = new PublicKey("11111111111111111111111111111111")
 
 export type UserType = anchor.IdlTypes<Solar>["UserType"];
-
 
 export type UserProfile = {
   username: string;
@@ -21,8 +23,8 @@ export type UserProfile = {
   phone: string;
   typeOfUser: UserType;
   verified: boolean;
-  latestCase: 0;
-  casesCount: 0;
+  listOfCases: [PublicKey, PublicKey, PublicKey, PublicKey, PublicKey];
+  totalParticipatingCases: number;
 }
 export interface UserProfileAccount extends UserProfile {
   authority?: PublicKey;
@@ -35,9 +37,9 @@ export const initialDefaultUserProfile: UserProfile = {
   lastName: "",
   phone: "",
   typeOfUser: { client: {} },
+  listOfCases: [initialFixedPubkey, initialFixedPubkey, initialFixedPubkey, initialFixedPubkey, initialFixedPubkey],
   verified: false,
-  latestCase: 0,
-  casesCount: 0,
+  totalParticipatingCases: 0
 }
 
 export function useUser() {
@@ -71,9 +73,8 @@ export function useUser() {
           const userAccount: any = await program.account.userProfile.fetch(userProfilePDA)
           console.log('user account is', userAccount)
           if (userAccount) {
-            setIsExistingUser(true)
-            delete userAccount.authority
-            console.log(userAccount)
+            setIsExistingUser(true);
+            delete userAccount.authority;
             setUser(userAccount)
           } else {
             setIsExistingUser(false)

@@ -3,6 +3,7 @@ import { useUser } from "src/hooks/userHooks";
 import React, { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { Button } from "@components/general/button";
+import { useCase } from "src/hooks/caseHooks";
 
 type VerifiedJudgeOption = {
   name: string,
@@ -17,6 +18,7 @@ export const AdminCaseCreate = () => {
   const [caseState, setCaseState] = useState<VerifiedJudgeOption>()
 
   const { loading, setLoading, isAdminUser, isExisitingUser } = useUser();
+  const { initializeCase, cases, isNotInAnyCase } = useCase()
 
   if (isExisitingUser && !isAdminUser)
     router.push("/")
@@ -53,7 +55,10 @@ export const AdminCaseCreate = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log(caseState)
+    if (caseState?.name && caseState?.address) {
+      initializeCase(new PublicKey(caseState?.address), caseState?.name)
+    }
+    return
   };
 
 

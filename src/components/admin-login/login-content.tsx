@@ -44,7 +44,7 @@ export function AdminLoginContent() {
     <div className="text-white m-8 w-full justify-center">
       <h1 className="text-center text-banner font-heading">Admin Login</h1>
       <div className="justify-center flex">
-        <div className="card bg-base-100 shadow-xl">
+        <div className="card bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400">
           <div className="card-body">
             <div className="flex flex-col gap-y-4">
               {

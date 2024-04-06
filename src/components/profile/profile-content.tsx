@@ -46,14 +46,12 @@ export function ProfileContent() {
         },
       });
       const data = await res.json();
-      console.log("DEBYG", data.data.documents[0])
       const status = data.data.documents.find((judge: any) => (judge.email === user.email))
-      console.log("DEBYG", status)
       setHasSentRequest((status !== undefined) ? true : false)
     };
 
     fetchJudges();
-  }, [hasSentRequest]);
+  }, [hasSentRequest, user]);
 
 
   React.useEffect(() => {
@@ -88,6 +86,10 @@ export function ProfileContent() {
   }
 
   const handleSendVerification = async () => {
+    if (user.email === "" && user.firstName === "" && user.lastName === "") {
+      toast.error("Please fill your profile first!")
+      return
+    }
     try {
       setLoading(true)
       const res = await fetch(`/api/appwrite/database/unverifiedJudges`, // TODO: Replace with caseId when available

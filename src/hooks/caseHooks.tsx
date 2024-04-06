@@ -9,11 +9,13 @@ import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapte
 
 import { Solar } from 'src/constants/solar'
 import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
+import { initialFixedPubkey, useUser } from './userHooks'
+
+
 
 export type CaseState = anchor.IdlTypes<Solar>["CaseState"]
 export type PartyType = anchor.IdlTypes<Solar>["Winner"]
 export type Winner = anchor.IdlTypes<Solar>["Winner"]
-export type CaseAccount = anchor.IdlAccounts<Solar>["case"]
 export type Party = {
   type_of_party: PartyType,
   members: [PublicKey?],
@@ -28,23 +30,30 @@ export type Case = {
   caseWinner: null | Winner,
   caseState: CaseState
 }
+export type CaseAccount = {
+  publicKey: PublicKey,
+  account: Case
+}
 
-export const initialDefaultCase: Case = {
-  id: new PublicKey(""),
-  name: "",
-  judge: new PublicKey(""),
-  prosecutor: {
-    type_of_party: "Prosecutor" as PartyType,
-    members: [],
-    size: 0
-  },
-  defendant: {
-    type_of_party: "Defendant" as PartyType,
-    members: [],
-    size: 0
-  },
-  caseWinner: "Defendant" as PartyType,
-  caseState: "ToStart" as CaseState,
+export const initialDefaultCase: CaseAccount = {
+  publicKey: new PublicKey(ADMIN_WALLET_PUBKEY),
+  account: {
+    id: new PublicKey(ADMIN_WALLET_PUBKEY),
+    name: "Sample Case",
+    judge: new PublicKey(ADMIN_WALLET_PUBKEY),
+    prosecutor: {
+      type_of_party: "Prosecutor" as PartyType,
+      members: [],
+      size: 0
+    },
+    defendant: {
+      type_of_party: "Defendant" as PartyType,
+      members: [],
+      size: 0
+    },
+    caseWinner: "Defendant" as PartyType,
+    caseState: "ToStart" as CaseState,
+  }
 }
 
 export function useCase() {
@@ -53,7 +62,10 @@ export function useCase() {
   const anchorWallet = useAnchorWallet()
 
   const [loading, setLoading] = useState(false)
-  const [cases, setCases] = useState<Case>(initialDefaultCase)
+  const [cases, setCases] = useState<CaseAccount[]>([])
+  const [isNotInAnyCase, setIsNotInAnyCase] = useState<boolean>(false)
+
+  const { isAdminUser, isExisitingUser, user } = useUser()
 
   const program = useMemo(() => {
     if (anchorWallet) {
@@ -69,47 +81,50 @@ export function useCase() {
       if (program && publicKey) {
         try {
           setLoading(true)
-          const [userProfilePDA] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-          const userAccount: any = await program.account.userProfile.fetch(userProfilePDA)
-          console.log('user account is', userAccount)
-          if (userAccount) {
-            setIsExistingUser(true)
-            delete userAccount.authority
-            console.log(userAccount)
-            setUser(userAccount)
-          } else {
-            setIsExistingUser(false)
+          if (isAdminUser) {
+            const caseAccounts: any = await program.account.case.all()
+            setIsNotInAnyCase(false)
+            setCases(caseAccounts)
+          }
+          else {
+            if (isExisitingUser && user) {
+              const listOfParticipatingCases = user.listOfCases.filter((casePubkey) => casePubkey.toBase58() !== initialFixedPubkey.toBase58())
+              if (listOfParticipatingCases.length > 0) {
+                const caseAccounts = await program.account.case.fetchMultiple(listOfParticipatingCases)
+                console.log('case accounts list for normal user', caseAccounts)
+                // setCases(caseAccounts)
+              }
+              else {
+                console.log('no cases found for user')
+              }
+            }
           }
         } catch (error) {
           console.log(error)
-          setIsExistingUser(false)
+          setIsNotInAnyCase(true)
         } finally {
           setLoading(false)
         }
       }
     }
-    const checkForAdminUser = () => {
-      if (publicKey && (publicKey.toString() === ADMIN_WALLET_PUBKEY))
-        setIsAdminUser(true)
-    }
-    checkForAdminUser()
-    checkUserExists()
+
+    getAllCasesForUser()
   }, [publicKey, program])
 
-  const initializeUser = async (username: string, usertype: UserType) => {
+  const initializeCase = async (presidingJudge: PublicKey, casename: string) => {
     if (program && publicKey) {
       try {
-        const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        console.log("user type is", `${usertype}`.toLowerCase())
-        const tx = await program.methods.setupUser(username, { [`${usertype}`.toLowerCase()]: {} })
+        const [casePda, caseBump] = findProgramAddressSync([utf8.encode('CASE_STATE'), publicKey.toBuffer()], program.programId)
+        const [judgePda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const tx = await program.methods.setupCase(casename)
           .accounts({
-            user: profilePda,
-            authority: publicKey,
+            case: casePda,
+            judge: judgePda,
+            admin: publicKey,
             systemProgram: SystemProgram.programId,
           })
           .rpc()
-        setIsExistingUser(true)
-        toast.success('Successfully initialized user.')
+        toast.success('Successfully created case.')
       } catch (err: any) {
         console.log(err)
         toast.error(err.toString())
@@ -118,58 +133,5 @@ export function useCase() {
     }
   }
 
-  const verifyUser = async (docId: string, userAddress: anchor.web3.PublicKey) => {
-    if (program && publicKey) {
-      try {
-        // Off-chain verification
-        await fetch("/api/appwrite/database/unverifiedJudges", {
-          method: "DELETE",
-          body: JSON.stringify({
-            docId: docId
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        // On-chain verification
-        const [userPda] = findProgramAddressSync([utf8.encode('USER_STATE'), userAddress.toBuffer()], program.programId)
-        const [adminPda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        const tx = await program.methods.verifyUser()
-          .accounts({
-            admin: adminPda,
-            user: userPda,
-            systemProgram: SystemProgram.programId,
-          })
-          .rpc()
-        toast.success('Successfully verified judge.')
-      } catch (err: any) {
-        console.log(err)
-        toast.error(err.toString())
-      }
-    }
-  }
-
-
-
-
-  const initializeUserProfile = async (email: string, firstName: string, lastName: string, phone: string) => {
-    if (program && publicKey) {
-      try {
-        const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        const tx = await program.methods.setupUserProfile(email, firstName, lastName, phone)
-          .accounts({
-            user: profilePda,
-            authority: publicKey,
-            systemProgram: SystemProgram.programId,
-          })
-          .rpc()
-        toast.success('Successfully user profile.')
-      } catch (err: any) {
-        console.log(err)
-        toast.error(err.toString())
-      }
-    }
-  }
-
-  return { isExisitingUser, isAdminUser, initializeUser, initializeUserProfile, loading, setLoading, user, verifyUser }
+  return { loading, setLoading, cases, setCases, isNotInAnyCase, initializeCase }
 }

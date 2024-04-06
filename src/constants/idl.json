@@ -134,6 +134,11 @@
           "isSigner": false
         },
         {
+          "name": "judge",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "admin",
           "isMut": true,
           "isSigner": true
@@ -145,10 +150,6 @@
         }
       ],
       "args": [
-        {
-          "name": "judge",
-          "type": "publicKey"
-        },
         {
           "name": "name",
           "type": "string"
@@ -486,6 +487,6 @@
     }
   ],
   "metadata": {
-    "address": "9ZmuZZ7ztT8fUsKne5AJA3QGzS4LEduLypg5axxJEEGY"
+    "address": "2uM9RwxrxBZ1bRJeUhBJf2JBzDM21fGdLdL7SDNJWg1L"
   }
 }
