@@ -6,22 +6,69 @@ import FileCardComponent from "@components/case/FileCard"
 import { Button } from "@components/general/button"
 import Modal from "@components/general/modal"
 import { useUser } from "src/hooks/userHooks";
-import { addDocumentToStorage } from "@pages/appwrite";
 import toast from 'react-hot-toast'
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCase } from "src/hooks/caseHooks";
 import type { CaseAccount } from "src/hooks/caseHooks";
+import { useDocument } from "src/hooks/documentHooks";
 
 export default function CaseViewPage() {
   const router = useRouter()
-  const fileCollection = [{ name: "Venture" }, { name: "Land dispute" }, { name: "Agreement 1" }, { name: "Agreement 2" }]
 
-  const { publicKey } = useWallet()
   const { searchKey, setSearchKey, currentViewingCase } = useCase()
+  const { user } = useUser()
+  const { uploadedFile, party, setParty, setUploadedFile, handleUpload, } = useDocument()
   const [navData, setNavData] = useState<Crumb[]>([])
+  const { publicKey } = useWallet()
+
+  const [documents, setDocuments] = useState<any>()
+  const [hasNoDocuments, setHasNoDocuments] = useState<boolean>(true)
+
+  const [selectedProsecutorTab, setSelectedProsecutorTab] = useState<boolean>(true);
+  const inactiveTabStyles = "tab text-white text-md"
+  const activeTabStyles = "tab text-white text-md tab-active"
 
   useEffect(() => {
-    console.log("in effect #2", router.query.caseId as string, currentViewingCase)
+    console.log("in useEffect, outside")
+    if (currentViewingCase) {
+      console.log("in useEffect, first if condition")
+      if (currentViewingCase.account.prosecutor.members.includes(publicKey))
+        setParty("prosecutor")
+      else if (currentViewingCase.account.defendant.members.includes(publicKey))
+        setParty("defendant")
+      else if (currentViewingCase.account.judge.toBase58() === publicKey?.toBase58()) {
+        if (!party)
+          setParty("prosecutor")
+      }
+      else {
+        setParty("unauthorized")
+        router.push("/")
+      }
+    }
+    if (currentViewingCase && party) {
+      const fetchRecords = async () => {
+        const res = await fetch(`/api/appwrite/storage/documents?caseId=${currentViewingCase.publicKey.toBase58()}&party=${party}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        const data = await res.json();
+        if (data.data) {
+          console.log("reached has no documents part")
+          setHasNoDocuments(false)
+        }
+        setDocuments(data.data);
+      };
+      fetchRecords();
+    }
+  }, [currentViewingCase, party]);
+
+  const emptyDocumentListStyles = "h-2/5 gap-12 mt-4 p-2 w-3/4"
+  const nonEmptyDocumentListStyles = "h-2/5 gap-12 mt-4 p-2 w-3/4 grid grid-cols-4 col-span-4"
+
+  useEffect(() => {
     if (router.query.caseId as string) {
       setSearchKey(router.query.caseId as string)
     }
@@ -33,35 +80,11 @@ export default function CaseViewPage() {
         },
         {
           name: currentViewingCase.account.name,
-          link: `/myCases/${currentViewingCase.account.name}`
+          link: `/myCases/${router.query.caseId as string}`
         }
       ])
     }
   }, [router.query.caseId, searchKey, currentViewingCase])
-
-
-  const [hasUploadedImage, setHasUploadedImage] = useState<boolean>(false)
-  const [uploadedFile, setUploadedFile] = useState<File>()
-
-  const { setLoading } = useUser()
-
-  const [documents, setDocuments] = useState<any>()
-
-  useEffect(() => {
-    const fetchCases = async () => {
-      const res = await fetch(`/api/appwrite/storage/documents?caseId=${router.query.caseId as string}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-      const data = await res.json();
-      setDocuments(data.data);
-    };
-
-    fetchCases();
-  }, [hasUploadedImage, documents]);
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -71,25 +94,6 @@ export default function CaseViewPage() {
     }
     return
   };
-
-  const handleUpload = async (e: FormEvent) => {
-    e.preventDefault()
-    if (!uploadedFile) {
-      toast.error("Please choose a file first!")
-      return
-    }
-    setLoading(true)
-    setHasUploadedImage(true)
-    const success = await addDocumentToStorage(uploadedFile, router.query.caseId as string)
-    if (success) {
-      toast.success('Successfully uploaded!')
-    }
-    else {
-      toast.error('Error occurred while uploading!')
-    }
-    setLoading(false)
-    // Now send tx to change the fields
-  }
 
   return (
     <>
@@ -102,21 +106,42 @@ export default function CaseViewPage() {
                 Upload your document
               </h1>
               <input onChange={handleChange} type="file" className="file-input file-input-bordered file-input-secondary w-full" />
-              <Button state={hasUploadedImage ? "loading" : "initial"} onClick={handleUpload} className="self-center hover:underline bg-green-700 hover:bg-green-8000 text-white w-1/3" >Upload</Button>
+              <Button state={!uploadedFile ? "loading" : "initial"} onClick={(e) => { handleUpload(e, router.query.caseId as string, "defendant") }} className="self-center hover:underline bg-green-700 hover:bg-green-8000 text-white w-1/3" >Upload</Button>
             </form>
           </Modal>
-          <div className="flex mx-4 mt-2 flex-row text-white  justify-between w-full">
-            <div className="font-heading text-4xl">{currentViewingCase?.account.name}</div>
-            <Button state="initial" onClick={() => { setHasUploadedImage(false); document.getElementById("FileUploadModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-white" >Upload documents +</Button>
+          <Modal id="ViewMembersModal">
+            <form className="mx-auto space-y-8 flex flex-col justify-center text-white" onSubmit={(e) => { e.preventDefault() }}>
+              <h1 className="text-center text-xl">
+                Members
+              </h1>
+              <h1 className="text-center text-xl">
+                Graph view goes here
+              </h1>
+            </form>
+          </Modal>
+          <div className="flex mx-4 mt-4 flex-row text-white  justify-between w-full">
+            <div className="text-4xl">{currentViewingCase?.account.name}</div>
+            <Button state="initial" onClick={() => { document.getElementById("FileUploadModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Upload documents +</Button>
           </div>
         </div>
+        <div className="flex flex-row w-3/4 mx-4">
+          {
+            user.typeOfUser.judge && publicKey?.toBase58() === currentViewingCase?.account.judge.toBase58() ?
+              <div role="tablist" className="tabs tabs-boxed bg-[#0B0708] border-white border w-1/2 mx-auto my-4 font-bold">
+                <button role="tab" className={selectedProsecutorTab ? activeTabStyles : inactiveTabStyles} onClick={() => { setSelectedProsecutorTab(true); setParty("prosecutor") }}>Prosecutor</button>
+                <button role="tab" className={!selectedProsecutorTab ? activeTabStyles : inactiveTabStyles} onClick={() => { setSelectedProsecutorTab(false); setParty("defendant") }}>Defendant</button>
+              </div>
+              :
+              <div className="text-xl font-light">{party?.toUpperCase()}</div>
+          }
+        </div>
         <div className="flex flex-row">
-          <div className="grid grid-cols-4 col-span-4 h-2/5 gap-12 mt-4 p-2 w-3/4">
+          <div className={hasNoDocuments ? emptyDocumentListStyles : nonEmptyDocumentListStyles}>
             {
-              documents && documents.length > 0 ?
-                documents.map((file) => <FileCardComponent caseId={router.query.caseId as string} fileName={file.name} fileId={file.name} />)
+              !hasNoDocuments ?
+                documents.map((file) => <FileCardComponent key={file.name} caseId={router.query.caseId as string} fileName={file.name} fileId={file.name} />)
                 :
-                <div className="flex flex-row justify-center">
+                <div className="flex flex-row justify-center w-full">
                   <div className="flex flex-col gap-y-8 m-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 256 256">
                       <g fill="#ffffff" fillRule="nonzero" stroke="none" strokeWidth="1" strokeLinecap="butt" strokeLinejoin="miter" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none" style={{ mixBlendMode: 'normal' }}>
@@ -131,15 +156,16 @@ export default function CaseViewPage() {
             }
           </div>
           <div className="divider-horizontal mt-4 w-[4px] bg-white"></div>
-          <div className="flex mt-4 h-screen flex-col ">
-            <div className="text-2xl text-white">Case change history</div>
+          <div className="flex mt-4 h-screen flex-col ml-6 gap-y-6">
+            <div className="text-2xl text-white">Case Timeline</div>
             <ul className="steps text-white steps-vertical">
-              <li className="step step-primary">s1</li>
-              <li className="step step-primary">upload 2</li>
-              <li className="step step-primary">change in document 1</li>
-              <li className="step">Removal of agreement 3</li>
+              {
+                currentViewingCase?.account.events.map(event => (
+                  <li className={event.classNames} key={event.message}>{event.message}</li>
+                ))
+              }
             </ul>
-            <button className="bg-purple-400 p-2 rounded-lg"> Members</button>
+            <Button state="initial" onClick={() => { document.getElementById("ViewMembersModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >View members</Button>
           </div>
         </div>
       </div>

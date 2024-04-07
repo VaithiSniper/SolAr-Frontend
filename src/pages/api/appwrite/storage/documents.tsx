@@ -13,8 +13,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     // Process a GET request
     const caseId = req.query.caseId as string;
+    const party = req.query.party as string;
     const documentsList = await getFilesListFromStorageForCaseId(caseId)
-    const truncatedDocumentList = documentsList.files.map((file) => ({
+    const truncatedDocumentList = documentsList.files.filter(file => file.name.includes(caseId) && file.name.includes(party)).map((file) => ({
       ...file,
       name: file.name.split("|")[1]
     }))

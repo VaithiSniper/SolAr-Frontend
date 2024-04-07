@@ -1,14 +1,13 @@
 import * as anchor from '@project-serum/anchor'
-import { useEffect, useMemo, useState } from 'react'
-import solarIDL from '../constants/idl.json'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
-import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { Solar } from 'src/constants/solar'
 import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
 import { defaultCaseAddress, defaultCaseAddressPubkey } from 'src/constants/case-constants'
+import { useProgram } from './programHooks'
 
 export type UserType = anchor.IdlTypes<Solar>["UserType"];
 
@@ -40,26 +39,12 @@ export const initialDefaultUserProfile: UserProfile = {
 }
 
 export function useUser() {
-  const { connection } = useConnection()
-  const { publicKey } = useWallet()
-  const anchorWallet = useAnchorWallet()
 
   const [isExisitingUser, setIsExistingUser] = useState(false)
   const [isAdminUser, setIsAdminUser] = useState(false)
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState<UserProfile>(initialDefaultUserProfile)
-
-  const program = useMemo(() => {
-    if (anchorWallet) {
-      const provider = new anchor.AnchorProvider(connection, anchorWallet, anchor.AnchorProvider.defaultOptions())
-      const programId = new PublicKey(solarIDL.metadata.address)
-      const programIdl = JSON.parse(JSON.stringify(solarIDL)) // to circumvent typescript issue
-      return new anchor.Program(programIdl, programId, provider)
-    }
-  }, [connection, anchorWallet])
-
-  useEffect(() => {
-  }, [publicKey])
+  const { program, publicKey } = useProgram()
 
   useEffect(() => {
     const checkUserExists = async () => {
@@ -88,12 +73,15 @@ export function useUser() {
         }
       }
     }
+
     const checkForAdminUser = () => {
       if (publicKey && (publicKey.toString() === ADMIN_WALLET_PUBKEY))
         setIsAdminUser(true)
     }
+
     checkForAdminUser()
     checkUserExists()
+
   }, [publicKey, program])
 
   const initializeUser = async (username: string, usertype: UserType) => {
@@ -157,9 +145,6 @@ export function useUser() {
       }
     }
   }
-
-
-
 
   const initializeUserProfile = async (email: string, firstName: string, lastName: string, phone: string) => {
     if (program && publicKey) {

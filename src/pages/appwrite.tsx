@@ -71,6 +71,11 @@ async function getDocumentsFromStorage(fileId: string) {
   return await storage.getFile(appwriteStorageBucketId, fileId);
 }
 
+function getDocumentPreviewFromStorage(fileId: string) {
+  const storage = getStorageInstance()
+  return storage.getFileView(appwriteStorageBucketId, fileId)
+}
+
 async function deleteDocumentFromDB(collectionId: string, documentId: string) {
   const db = getDatabaseInstance()
   try {
@@ -96,4 +101,4 @@ type UnverifiedJudges = {
 }
 
 export type { UnverifiedJudges }
-export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }
+export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getDocumentPreviewFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }

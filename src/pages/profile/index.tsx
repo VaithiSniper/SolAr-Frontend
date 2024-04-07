@@ -8,7 +8,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>SolAr: Profile</title>
+        <title>Profile</title>
         <meta
           name="description"
           content="SolAr: Storage Layer for the future"
