@@ -33,3 +33,8 @@ code {
   position: relative;
   text-align: center;
 }
+
+
+.notificationapi-button .icon-bell-o:before {
+  content: url('../../public/icon.png');
+}

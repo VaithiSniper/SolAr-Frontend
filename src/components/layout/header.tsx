@@ -6,6 +6,8 @@ import { useRouter } from "next/router";
 import { useUser } from "src/hooks/userHooks";
 import { Button } from "../general/button";
 
+import NotificationAPIComponent from "./bell";
+
 type navLink = {
   label: string;
   link: string;
@@ -40,10 +42,17 @@ export function Header() {
   const defaultStyles = "mx-4 text-[#777576] hover:text-white";
 
 
-  const { isAdminUser, isExisitingUser } =
-    useUser();
+  const {
+    isAdminUser,
+    isExisitingUser,
+    loading,
+    setLoading,
+    user,
+    initializeUserProfile,
+  } = useUser();
 
-  const [showNotificationCard, setShowNotificationCard] = useState<boolean>(false);
+  const [showNotificationCard, setShowNotificationCard] =
+    useState<boolean>(false);
 
   return (
     <>
@@ -101,7 +110,7 @@ export function Header() {
                     <svg style={{ color: "white" }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-bell-fill" viewBox="0 0 16 16"> <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" fill="white"></path> </svg>
                   </div>
                   <ul tabIndex={0} className="menu dropdown-content z-[1] shadow rounded-box w-[30rem]">
-                    <div>Put notification card here!</div>
+                    <NotificationAPIComponent />
                   </ul>
                 </div>
                 <Link href="/profile">
