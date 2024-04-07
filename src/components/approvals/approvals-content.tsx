@@ -68,6 +68,7 @@ export const AdminApprovalsContent = () => {
                 <div className="card mt-10 px-10 bg-[#0B0708] border-white border shadow-lg shadow-fuchsia-400 text-white">
                   <div className="card-body">
                     <div className="overflow-x-auto">
+                      {/* TODO: Add feature to search in table */}
                       <table className="table">
                         {/* head */}
                         <thead>
@@ -103,7 +104,7 @@ export const AdminApprovalsContent = () => {
                                           `${judge.address}`
                                         );
                                         setLoading(true)
-                                        await verifyUser(judge.docId, publicKey);
+                                        await verifyUser(judge.docId, publicKey, judge.name, judge.email);
                                         setIsUserVerified(true)
                                       }}
                                     >

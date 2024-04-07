@@ -1,4 +1,5 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
+import { toast } from "react-hot-toast";
 
 const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || ""
 const appwriteProjectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || ""
@@ -37,8 +38,8 @@ async function addDocumentToStorage(document: File, caseId: string) {
     );
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }
@@ -49,8 +50,8 @@ async function addDocumentToDB(collectionId: string, document: any) {
     await db.createDocument(appwriteDatabaseId, collectionId, ID.unique(), document)
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }
@@ -76,8 +77,8 @@ async function deleteDocumentFromDB(collectionId: string, documentId: string) {
     await db.deleteDocument(appwriteDatabaseId, collectionId, documentId)
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }

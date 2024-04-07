@@ -6,12 +6,9 @@ import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
 import { findProgramAddressSync } from '@project-serum/anchor/dist/cjs/utils/pubkey'
 import { useAnchorWallet, useConnection, useWallet } from '@solana/wallet-adapter-react'
-
 import { Solar } from 'src/constants/solar'
 import { ADMIN_WALLET_PUBKEY } from 'src/constants/admin'
-import { useCase } from './caseHooks'
-
-export const initialFixedPubkey = new PublicKey("11111111111111111111111111111111")
+import { defaultCaseAddress, defaultCaseAddressPubkey } from 'src/constants/case-constants'
 
 export type UserType = anchor.IdlTypes<Solar>["UserType"];
 
@@ -37,7 +34,7 @@ export const initialDefaultUserProfile: UserProfile = {
   lastName: "",
   phone: "",
   typeOfUser: { client: {} },
-  listOfCases: [initialFixedPubkey, initialFixedPubkey, initialFixedPubkey, initialFixedPubkey, initialFixedPubkey],
+  listOfCases: [defaultCaseAddressPubkey, defaultCaseAddressPubkey, defaultCaseAddressPubkey, defaultCaseAddressPubkey, defaultCaseAddressPubkey],
   verified: false,
   totalParticipatingCases: 0
 }
@@ -70,17 +67,21 @@ export function useUser() {
         try {
           setLoading(true)
           const [userProfilePDA] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-          const userAccount: any = await program.account.userProfile.fetch(userProfilePDA)
-          console.log('user account is', userAccount)
+          let userAccount: any = await program.account.userProfile.fetch(userProfilePDA)
           if (userAccount) {
             setIsExistingUser(true);
             delete userAccount.authority;
+            const participatingCaseList: PublicKey[] = userAccount.listOfCases
+              .filter((caseItem: PublicKey) => (
+                caseItem.toBase58() !== defaultCaseAddress
+              ))
+            userAccount.listOfCases = participatingCaseList
             setUser(userAccount)
           } else {
             setIsExistingUser(false)
           }
-        } catch (error) {
-          console.log(error)
+        } catch (error: any) {
+          toast.error(error.toString())
           setIsExistingUser(false)
         } finally {
           setLoading(false)
@@ -99,7 +100,6 @@ export function useUser() {
     if (program && publicKey) {
       try {
         const [profilePda, profileBump] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
-        console.log("user type is", `${usertype}`.toLowerCase())
         const tx = await program.methods.setupUser(username, { [`${usertype}`.toLowerCase()]: {} })
           .accounts({
             user: profilePda,
@@ -110,14 +110,13 @@ export function useUser() {
         setIsExistingUser(true)
         toast.success('Successfully initialized user.')
       } catch (err: any) {
-        console.log(err)
         toast.error(err.toString())
       } finally {
       }
     }
   }
 
-  const verifyUser = async (docId: string, userAddress: anchor.web3.PublicKey) => {
+  const verifyUser = async (docId: string, userAddress: anchor.web3.PublicKey, userName: string, userEmail: string) => {
     if (program && publicKey) {
       try {
         // On-chain verification
@@ -144,9 +143,9 @@ export function useUser() {
         await fetch("/api/appwrite/database/verifiedJudges", {
           method: "POST",
           body: JSON.stringify({
-            address: publicKey,
-            name: `${user.firstName} ${user.lastName}`,
-            email: user.email,
+            address: userAddress,
+            name: userName,
+            email: userEmail,
           }),
           headers: {
             "Content-Type": "application/json",
@@ -154,7 +153,6 @@ export function useUser() {
         });
         toast.success('Successfully verified judge.')
       } catch (err: any) {
-        console.log(err)
         toast.error(err.toString())
       }
     }
@@ -176,7 +174,6 @@ export function useUser() {
           .rpc()
         toast.success('Successfully user profile.')
       } catch (err: any) {
-        console.log(err)
         toast.error(err.toString())
       }
     }

@@ -151,6 +151,10 @@
       ],
       "args": [
         {
+          "name": "bump",
+          "type": "u8"
+        },
+        {
           "name": "name",
           "type": "string"
         }
@@ -244,10 +248,6 @@
       "type": {
         "kind": "struct",
         "fields": [
-          {
-            "name": "id",
-            "type": "publicKey"
-          },
           {
             "name": "name",
             "type": "string"
@@ -487,6 +487,6 @@
     }
   ],
   "metadata": {
-    "address": "2uM9RwxrxBZ1bRJeUhBJf2JBzDM21fGdLdL7SDNJWg1L"
+    "address": "8zmYTinF3yjHpQgqo7jhhcATj7GDvS2v1iZGZns1JABp"
   }
 }

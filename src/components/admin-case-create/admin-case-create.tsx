@@ -4,6 +4,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "rea
 import { PublicKey } from "@solana/web3.js";
 import { Button } from "@components/general/button";
 import { useCase } from "src/hooks/caseHooks";
+import { publicKey } from "@project-serum/anchor/dist/cjs/utils";
 
 type VerifiedJudgeOption = {
   name: string,
@@ -39,11 +40,10 @@ export const AdminCaseCreate = () => {
       setVerifiedJudgesList(dataToSet)
     }
     fetchJudges()
-  }, [verifiedJugesList])
+  }, [isAdminUser])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    console.log(name, value)
     setCaseState((prevValue) => (
       {
         ...prevValue,

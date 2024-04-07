@@ -7,9 +7,8 @@ import { useCase } from "src/hooks/caseHooks";
 export const AdminCaseManage = () => {
   const router = useRouter();
 
-  const { loading, isAdminUser, isExisitingUser } = useUser();
+  const { loading, isAdminUser, isExisitingUser, user } = useUser();
   const { cases, isNotInAnyCase } = useCase()
-  console.log(cases)
 
   if (isExisitingUser && !isAdminUser)
     router.push("/")
@@ -32,7 +31,6 @@ export const AdminCaseManage = () => {
                         <thead>
                           <tr className="text-xl font-mono text-white">
                             <th>Address</th>
-                            <th>ID</th>
                             <th>Name</th>
                             <th>Judge Address</th>
                             <th>Winner</th>
@@ -44,7 +42,6 @@ export const AdminCaseManage = () => {
                             cases.map(({ publicKey, account }) => (
                               <tr key={publicKey.toBase58()}>
                                 <td>{publicKey.toBase58().substring(0, 6) + "..."}</td>
-                                <td>{account.id.toBase58().substring(0, 6) + "..."}</td>
                                 <td>{account.name}</td>
                                 <td>{account.judge.toBase58().substring(0, 6) + "..."}</td>
                                 <td>{account.caseWinner ? (account.caseWinner.defendant ? "Defendant" : "Prosecutor") : "Undecided"}</td>

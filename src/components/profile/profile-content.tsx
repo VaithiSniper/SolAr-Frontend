@@ -92,7 +92,7 @@ export function ProfileContent() {
     }
     try {
       setLoading(true)
-      const res = await fetch(`/api/appwrite/database/unverifiedJudges`, // TODO: Replace with caseId when available
+      const res = await fetch(`/api/appwrite/database/unverifiedJudges`,
         {
           method: "POST",
           body: JSON.stringify({

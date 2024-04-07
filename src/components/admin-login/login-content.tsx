@@ -59,7 +59,7 @@ export function AdminLoginContent() {
                               <div className="flex flex-row mt-4 justify-center flex-grow gap-x-10">
                                 <Button
                                   state="initial"
-                                  onClick={() => router.push("/admin")}
+                                  onClick={() => router.push("/admin/approvals")}
                                   className="p-2 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center"
                                 >
                                   Continue
