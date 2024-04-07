@@ -7,7 +7,7 @@ export type Crumb = {
 
 export default function BreadcrumbsNavComponent(props: { data: Crumb[] }) {
 
-  const currentClassnames = "font-bold underline text-white"
+  const currentClassnames = "font-bold underline underline-offset-4 text-white"
 
   return (
     <div className="text-sm p-3 text-gray-800 bg-violet-300 breadcrumbs font-semibold">

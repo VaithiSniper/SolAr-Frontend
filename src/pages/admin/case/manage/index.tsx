@@ -1,20 +1,22 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
-import { ProfileContent } from "@components/profile/profile-content";
-
+import { AdminCaseManage } from "src/components/admin-case-manage/admin-case-manage";
 
 const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Profile</title>
+        <title>Manage Case</title>
         <meta
           name="description"
           content="SolAr: Storage Layer for the future"
         />
       </Head>
-      <ProfileContent />
+      <div className="flex justify-center">
+        {" "}
+        <AdminCaseManage />
+      </div>
     </>
   );
 };

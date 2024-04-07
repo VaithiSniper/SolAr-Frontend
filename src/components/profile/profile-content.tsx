@@ -46,14 +46,12 @@ export function ProfileContent() {
         },
       });
       const data = await res.json();
-      const status = data.data.documents.find((judge) => {
-        judge.username === user.username
-      })
-      setHasSentRequest((status !== undefined) ? false : true)
+      const status = data.data.documents.find((judge: any) => (judge.email === user.email))
+      setHasSentRequest((status !== undefined) ? true : false)
     };
 
     fetchJudges();
-  }, [hasSentRequest]);
+  }, [hasSentRequest, user]);
 
 
   React.useEffect(() => {
@@ -88,9 +86,13 @@ export function ProfileContent() {
   }
 
   const handleSendVerification = async () => {
+    if (user.email === "" && user.firstName === "" && user.lastName === "") {
+      toast.error("Please fill your profile first!")
+      return
+    }
     try {
       setLoading(true)
-      const res = await fetch(`/api/appwrite/database/unverifiedJudges`, // TODO: Replace with caseId when available
+      const res = await fetch(`/api/appwrite/database/unverifiedJudges`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -128,7 +130,7 @@ export function ProfileContent() {
           {
             !hasSentRequest && !user.verified && user.typeOfUser.judge ?
               (
-                <div className="stats bg-primary text-white text-center w-full">
+                <div className="stats bg-primary text-white text-center w-full shadow-md shadow-fuchsia-400">
                   <div className="stat">
                     <div className="stat-title text-white">You are not verified yet!</div>
                     <div className="stat-actions">

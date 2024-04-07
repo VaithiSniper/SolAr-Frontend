@@ -1,4 +1,5 @@
 import { Client, Databases, ID, Query, Storage } from "appwrite";
+import { toast } from "react-hot-toast";
 
 const appwriteEndpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || ""
 const appwriteProjectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || ""
@@ -37,8 +38,8 @@ async function addDocumentToStorage(document: File, caseId: string) {
     );
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }
@@ -49,8 +50,8 @@ async function addDocumentToDB(collectionId: string, document: any) {
     await db.createDocument(appwriteDatabaseId, collectionId, ID.unique(), document)
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }
@@ -70,14 +71,19 @@ async function getDocumentsFromStorage(fileId: string) {
   return await storage.getFile(appwriteStorageBucketId, fileId);
 }
 
+function getDocumentPreviewFromStorage(fileId: string) {
+  const storage = getStorageInstance()
+  return storage.getFileView(appwriteStorageBucketId, fileId)
+}
+
 async function deleteDocumentFromDB(collectionId: string, documentId: string) {
   const db = getDatabaseInstance()
   try {
     await db.deleteDocument(appwriteDatabaseId, collectionId, documentId)
     return true
   }
-  catch (err) {
-    console.error(err)
+  catch (err: any) {
+    toast.error(err.toString())
     return false
   }
 }
@@ -95,4 +101,4 @@ type UnverifiedJudges = {
 }
 
 export type { UnverifiedJudges }
-export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }
+export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getDocumentPreviewFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }

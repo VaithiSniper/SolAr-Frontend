@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import React from "react";
-import { AdminContent } from "src/components/admin/admin-content";
+import { AdminApprovalsContent } from "src/components/approvals/approvals-content";
 
 const Home: NextPage = () => {
   return (
@@ -15,10 +15,8 @@ const Home: NextPage = () => {
       </Head>
       <div className="flex justify-center">
         {" "}
-        <AdminContent />
+        <AdminApprovalsContent />
       </div>
-
-      {/* <Footer /> */}
     </>
   );
 };
