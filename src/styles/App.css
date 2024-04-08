@@ -34,7 +34,60 @@ code {
   text-align: center;
 }
 
-
 .notificationapi-button .icon-bell-o:before {
   content: url('../../public/icon.png');
+}
+
+.notificationapi-button {
+  transform: scale(1.25) !important;
+  margin: 0.75rem !important;
+  margin-top: 1rem !important;
+}
+.notificationapi-popup {
+  /* background-color: #0B0708 !important; */
+  color: white !important;
+  font-family: Inter !important;
+  /* background-image: radial-gradient(115deg, rgb(20, 241, 149, 30%), rgb(153, 69, 255, 50%)) !important; */
+    background-color: #0B0708 !important;
+background-image: radial-gradient(circle, rgba(20, 241, 149, 0.3) 10%, transparent 70%),
+                    radial-gradient(circle, rgba(153, 69, 255, 0.3) 10%, transparent 70%) !important;
+  background-size: 500px 500px !important; /* Adjust the size based on your preference */
+  background-position: top left, bottom right !important; /* Adjust the positions of the gradients */
+  background-repeat: repeat-y !important; /* Repeat the pattern */
+}
+
+.notificationapi-header {
+  /* text-decoration: underline solid white 5px !important; */
+  padding-bottom: 8px !important;
+  border-bottom: 1px white solid !important;
+}
+
+.notificationapi-readAll-button > .icon-check {
+  color: white !important;
+}
+
+.notificationapi-preferences-button > .icon-cog {
+  color: white !important;
+  display: none;
+}
+
+.notificationapi-notification {
+  --tw-shadow: 0 3px 28px -12px rgb(232, 121, 249, 1); /* Fuchsia shadow */
+  margin: 1rem !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important; 
+  border: 1px solid white !important;
+}
+
+:hover.notificationapi-notification {
+  background-color: rgb(232, 121, 249, 0.3) !important;
+}
+
+.notificationapi-notification-title {
+  margin-top: 2px !important;
+  color: white !important;
+}
+
+.notificationapi-notification-date {
+  margin-top: 2px !important;
+  color: rgb(232, 121, 249, 1) !important;
 }

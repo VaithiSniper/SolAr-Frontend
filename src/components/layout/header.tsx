@@ -105,14 +105,7 @@ export function Header() {
           {
             publicKey && isExisitingUser ? (
               <>
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">
-                    <svg style={{ color: "white" }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-bell-fill" viewBox="0 0 16 16"> <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z" fill="white"></path> </svg>
-                  </div>
-                  <ul tabIndex={0} className="menu dropdown-content z-[1] shadow rounded-box w-[30rem]">
-                    <NotificationAPIComponent />
-                  </ul>
-                </div>
+                <NotificationAPIComponent />
                 <Link href="/profile">
                   <div
                     tabIndex={0}
@@ -135,16 +128,16 @@ export function Header() {
             ) : (
               <Link href={isAdminUser ? "/admin/login" : "/login"}>
                 <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
-                >
-                  Login
-                </div>
-              </Link>
-            )}
-        </div>
+                tabIndex={0}
+            role="button"
+                                            className="btn m-1 bg-fuchsia-300 hover:bg-fuchsia-500 text-black"
+          >
+                            Login
+                                  </div>
+        </Link>
+      )}
       </div>
+    </div>
     </>
   );
 }

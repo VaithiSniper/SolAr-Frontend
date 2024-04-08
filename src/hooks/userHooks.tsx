@@ -66,7 +66,6 @@ export function useUser() {
             setIsExistingUser(false)
           }
         } catch (error: any) {
-          toast.error(error.toString())
           setIsExistingUser(false)
         } finally {
           setLoading(false)
@@ -139,6 +138,18 @@ export function useUser() {
             "Content-Type": "application/json",
           },
         });
+        // Send notification 
+        await fetch("/api/notify/verification", {
+          method: "POST",
+          body: JSON.stringify({
+            userId: userAddress.toBase58(),
+            txnId: tx
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
         toast.success('Successfully verified judge.')
       } catch (err: any) {
         toast.error(err.toString())
