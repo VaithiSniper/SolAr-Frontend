@@ -6,14 +6,14 @@ import { useProgram } from './programHooks';
 import { PublicKey } from 'ardrive-core-js';
 
 export type PartyTypeString = "prosecutor" | "defendant" | "unauthorized"
+export type DocumentId = string;
 
 export function useDocument() {
 
   const [uploadedFile, setUploadedFile] = useState<File>()
   const [party, setParty] = useState<PartyTypeString>()
-  const { searchKey, currentViewingCase } = useCase()
-  const { publicKey } = useProgram()
-
+  const [currentViewingDocument, setCurrentViewingDocument] = useState<DocumentId>()
+  const [currentViewingDocumentHref, setCurrentViewingDocumentHref] = useState<DocumentId>()
 
   const handleUpload = async (e: FormEvent, caseId: string, party: string) => {
     e.preventDefault()
@@ -31,5 +31,5 @@ export function useDocument() {
     // Now send tx to change the fields
   }
 
-  return { uploadedFile, setUploadedFile, handleUpload, party, setParty }
+  return { uploadedFile, setUploadedFile, handleUpload, party, setParty, currentViewingDocument, setCurrentViewingDocument, currentViewingDocumentHref, setCurrentViewingDocumentHref }
 }

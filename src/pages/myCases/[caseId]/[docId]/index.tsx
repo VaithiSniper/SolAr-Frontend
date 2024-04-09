@@ -7,16 +7,29 @@ import { useCase } from "src/hooks/caseHooks"
 import { useEffect, useState } from "react"
 import { Button } from "@components/general/button"
 import { getDocumentPreviewFromStorage, getDocumentsFromStorage } from "@pages/appwrite"
+import { useDocument } from "src/hooks/documentHooks"
 
 export default function DocumentViewPage() {
 
   const router = useRouter()
 
   const { searchKey, setSearchKey, currentViewingCase } = useCase()
+  const { currentViewingDocument, setCurrentViewingDocument, currentViewingDocumentHref, setCurrentViewingDocumentHref } = useDocument()
+
   const [navData, setNavData] = useState<Crumb[]>([])
 
   const fileView = getDocumentPreviewFromStorage("6612e848a02ae6746d72")
   const fileViewUrl = fileView.href
+
+  useEffect(() => {
+    if (router.query.docId as string) {
+      setCurrentViewingDocument(router.query.docId as string)
+      const fileView = getDocumentPreviewFromStorage(router.query.docId as string)
+      setCurrentViewingDocumentHref(fileView.href)
+    }
+  }, [router.query.docId, currentViewingDocument, currentViewingDocumentHref])
+
+
 
   useEffect(() => {
     if (router.query.caseId as string) {
@@ -49,7 +62,7 @@ export default function DocumentViewPage() {
         </div>
         <div className="flex flex-row">
           <div className="flex flex-row w-3/4 mt-8 justify-center">
-            <iframe src={fileViewUrl} width="960" height="640" allow="autoplay"></iframe>
+            <iframe src={currentViewingDocumentHref} width="960" height="640" allow="autoplay"></iframe>
           </div>
           <div className="divider-horizontal w-[4px] mt-8 bg-white"></div>
           <div className="flex mt-4 h-screen flex-col ml-6 gap-y-6">

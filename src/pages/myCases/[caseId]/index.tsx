@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useDebugValue, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router"
 import BreadcrumbsNavComponent from "@components/layout/breadcrumbs-nav"
 import { Crumb } from "@components/layout/breadcrumbs-nav"
@@ -6,10 +6,8 @@ import FileCardComponent from "@components/case/FileCard"
 import { Button } from "@components/general/button"
 import Modal from "@components/general/modal"
 import { useUser } from "src/hooks/userHooks";
-import toast from 'react-hot-toast'
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useCase } from "src/hooks/caseHooks";
-import type { CaseAccount } from "src/hooks/caseHooks";
 import { useDocument } from "src/hooks/documentHooks";
 
 export default function CaseViewPage() {
@@ -115,7 +113,7 @@ export default function CaseViewPage() {
                 Members
               </h1>
               <h1 className="text-center text-xl">
-                Graph view goes here
+                {/* <MemberView /> */}
               </h1>
             </form>
           </Modal>
@@ -139,7 +137,7 @@ export default function CaseViewPage() {
           <div className={hasNoDocuments ? emptyDocumentListStyles : nonEmptyDocumentListStyles}>
             {
               !hasNoDocuments ?
-                documents.map((file) => <FileCardComponent key={file.name} caseId={router.query.caseId as string} fileName={file.name} fileId={file.name} />)
+                documents.map((file) => <FileCardComponent key={file.name} caseId={router.query.caseId as string} fileName={file.name} fileId={file["$id"]} />)
                 :
                 <div className="flex flex-row justify-center w-full">
                   <div className="flex flex-col gap-y-8 m-2">
