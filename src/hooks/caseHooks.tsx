@@ -1,5 +1,5 @@
 import * as anchor from '@project-serum/anchor'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { PublicKey, SystemProgram } from '@solana/web3.js'
 import { utf8 } from '@project-serum/anchor/dist/cjs/utils/bytes'
@@ -162,6 +162,7 @@ export function useCase() {
             console.log("after setting cases", searchKey)
             if (searchKey) {
               setCurrentViewingCase(getCurrentViewingCaseBySearchKey(caseAccounts, searchKey))
+              setLoading(false)
             }
           }
           else {
@@ -186,6 +187,20 @@ export function useCase() {
 
     getAllCasesForUser()
   }, [searchKey, user, publicKey, program])
+
+  const prosecutorsAddressList = useMemo(() => {
+    if (currentViewingCase)
+      return currentViewingCase.account.prosecutor.members.map(memberItem => memberItem?.toBase58())
+    else
+      return []
+  }, [currentViewingCase])
+
+  const defendantsAddressList = useMemo(() => {
+    if (currentViewingCase)
+      return currentViewingCase.account.prosecutor.members.map(memberItem => memberItem?.toBase58())
+    else
+      return []
+  }, [currentViewingCase])
 
   const getCurrentViewingCaseBySearchKey = (caseAccounts: CaseAccount[], searchKey: string) => {
     console.log("Searching for:", searchKey);
@@ -246,5 +261,29 @@ export function useCase() {
     }
   }
 
-  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState }
+  const addMemberToParty = async (caseAddress: PublicKey, memberAddress: PublicKey, partyType: PartyType) => {
+    if (program && publicKey) {
+      console.log(caseAddress.toBase58(), memberAddress.toBase58(), partyType)
+      try {
+        const [memberPda] = findProgramAddressSync([utf8.encode('USER_STATE'), memberAddress.toBuffer()], program.programId)
+        const [judgePda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const party = { [`${partyType}`.toLowerCase()]: {} }
+        console.log(memberPda, judgePda, party)
+        await program.methods.addMemberToParty(memberAddress, party)
+          .accounts({
+            case: caseAddress,
+            user: memberPda,
+            judge: judgePda,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully added member!')
+      } catch (err: any) {
+        toast.error(err.toString())
+      } finally {
+      }
+    }
+  }
+
+  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList }
 }

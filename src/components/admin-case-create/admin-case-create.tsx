@@ -56,8 +56,9 @@ export const AdminCaseCreate = () => {
     e.preventDefault();
     setLoading(true);
     if (caseState?.name && caseState?.address) {
-      initializeCase(new PublicKey(caseState?.address), caseState?.name)
+      await initializeCase(new PublicKey(caseState?.address), caseState?.name)
     }
+    setLoading(false);
     return
   };
 

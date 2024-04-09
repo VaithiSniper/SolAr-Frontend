@@ -139,7 +139,7 @@ export function useUser() {
           },
         });
         // Send notification 
-        await fetch("/api/notify/verification", {
+        const verificationResult = await fetch("/api/notify/verification", {
           method: "POST",
           body: JSON.stringify({
             userId: userAddress.toBase58(),
@@ -149,7 +149,7 @@ export function useUser() {
             "Content-Type": "application/json",
           },
         });
-
+        console.log("verificationResult", verificationResult)
         toast.success('Successfully verified judge.')
       } catch (err: any) {
         toast.error(err.toString())

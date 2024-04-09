@@ -64,8 +64,7 @@ export default function DocumentViewPage() {
           <div className="flex flex-row w-3/4 mt-8 justify-center">
             <iframe src={currentViewingDocumentHref} width="960" height="640" allow="autoplay"></iframe>
           </div>
-          <div className="divider-horizontal w-[4px] mt-8 bg-white"></div>
-          <div className="flex mt-4 h-screen flex-col ml-6 gap-y-6">
+          <div className="flex mt-4 h-screen flex-col ml-6 gap-y-6 border border-white p-8 rounded-xl">
             <div className="text-2xl text-white">Document Timeline</div>
             <ul className="steps text-white steps-vertical">
               {

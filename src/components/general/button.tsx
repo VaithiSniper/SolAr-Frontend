@@ -1,8 +1,9 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import classNames from "classnames";
 import React, { MouseEventHandler, ReactNode } from "react";
+import Image from "next/image";
 
-export type ButtonState = "initial" | "loading" | "success" | "error";
+export type ButtonState = "initial" | "loading" | "success" | "error" | "disabled";
 
 type Props = {
   state: ButtonState;
@@ -24,9 +25,14 @@ export function Button({ type, state, onClick, children, className }: Props) {
       className={buttonClasses}
       onClick={handleClick}
       type={type}
-      disabled={state === "loading"}
+      disabled={state === "loading" || state === "disabled"}
     >
-      {children}
+      {
+        state === "loading" ?
+          <span className="loading loading-ring loading-md"></span>
+          :
+          children
+      }
     </button>
   );
 }

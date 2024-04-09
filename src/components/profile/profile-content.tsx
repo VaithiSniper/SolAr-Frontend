@@ -5,18 +5,16 @@ import { useRouter } from "next/router";
 import { UserProfile } from "src/hooks/userHooks";
 import Avatar from "../general/avatar";
 import { Button } from "../general/button";
-import QRCode from "react-qr-code";
 import Modal from "@components/general/modal";
-import { addDocumentToDB } from "@pages/appwrite";
+import { QRCodeSVG } from 'qrcode.react';
 import { toast } from "react-hot-toast";
-import Image from "next/image";
-import type { UserType } from "src/hooks/userHooks";
+import { useProgram } from "src/hooks/programHooks";
 
 export function ProfileContent() {
   // Router instance to navigate
   const router = useRouter()
 
-  const { publicKey } = useWallet();
+  const { publicKey } = useProgram();
 
   // If you change your wallet, then refresh
   const prevPublickKey = React.useRef<string>(publicKey?.toBase58() || "");
@@ -52,7 +50,6 @@ export function ProfileContent() {
 
     fetchJudges();
   }, [hasSentRequest, user]);
-
 
   React.useEffect(() => {
     if (user || isExisitingUser) {
@@ -118,12 +115,16 @@ export function ProfileContent() {
         Profile
       </h1>
       <Modal id="QRCodeModal">
-        <QRCode
-          size={256}
-          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-          value={publicKey?.toString() || ""}
-          viewBox={`0 0 256 256`}
-        />
+        <>
+          <QRCodeSVG value="Av7MacPCGS2F3pLmQWqhhJasnci7siBFzZsTyBNuyKNY" size={256} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
+        </>
+        {/* publicKey?.toBase58() as string */}
+        {/* <QRCode */}
+        {/*   size={256} */}
+        {/*   style={{ height: "auto", maxWidth: "100%", width: "100%" }} */}
+        {/*   value={""} */}
+        {/*   viewBox={`0 0 256 256`} */}
+        {/* /> */}
       </Modal>
       <div className="justify-center flex">
         <div className="card w-96 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400">
@@ -181,13 +182,13 @@ export function ProfileContent() {
                 {
                   isEditing ?
                     <>
-                      <Button state={loading ? "loading" : "initial"} onClick={handleSubmit} className="p-2 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Submit</Button>
-                      <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(false)} className="p-2 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Cancel</Button>
+                      <Button state={loading ? "disabled" : "initial"} onClick={handleSubmit} className="p-2 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Submit</Button>
+                      <Button state={loading ? "disabled" : "initial"} onClick={() => setIsEditing(false)} className="p-2 text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Cancel</Button>
                     </>
                     :
                     <>
-                      <Button onClick={() => { document.getElementById("QRCodeModal").showModal() }} state={publicKey ? "initial" : "loading"} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Show QR Code</Button>
-                      <Button state={loading ? "loading" : "initial"} onClick={() => setIsEditing(true)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Edit</Button>
+                      <Button onClick={() => { document.getElementById("QRCodeModal").showModal() }} state={publicKey ? "initial" : "disabled"} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Show QR Code</Button>
+                      <Button state={loading ? "disabled" : "initial"} onClick={() => setIsEditing(true)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center">Edit</Button>
                     </>
                 }
               </div>

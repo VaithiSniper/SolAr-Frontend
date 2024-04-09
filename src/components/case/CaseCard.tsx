@@ -20,8 +20,8 @@ export default function CaseCardComponent({ lawsuit: { publicKey, account } }: {
 
   const caseStateParse = getStatusMessageAndStylesForCaseState(account.caseState)
 
-  const participantsList = [account.judgeAccount].concat(account.prosecutor.memberAccounts as UserProfile[], account.defendant.memberAccounts as UserProfile[])
-  const imageOrCharGroupList = participantsList.map((participant: any, index) => participant[index.toString()].username.substring(0, 1) as string)
+  const participantsList = [...account.judgeAccount].concat(account.prosecutor.memberAccounts as UserProfile[], account.defendant.memberAccounts as UserProfile[])
+  const imageOrCharGroupList = participantsList.map((participant: any, index) => participant.username.substring(0, 1) as string)
 
   return (
     <div key={publicKey.toBase58()} className="card w-96 mt-4 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400">

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import ClientWalletProvider from "@components/contexts/ClientWalletProvider";
-import { SOLANA_DEV, SOLANA_LOCAL } from "@utils/endpoints";
+import { NETWORK, SOLANA_DEV, SOLANA_LOCAL } from "@utils/endpoints";
 
 import "../styles/globals.css";
 import "../styles/App.css";
@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const network = WalletAdapterNetwork.Devnet
   const rpcUrl = useMemo(() => clusterApiUrl(network), [network])
   return (
-    <ConnectionProvider endpoint={SOLANA_LOCAL}>
+    <ConnectionProvider endpoint={NETWORK}>
       <ClientWalletProvider wallets={wallets}>
         <ReactUIWalletModalProviderDynamic>
           <Toaster position="bottom-right" reverseOrder={true} />
