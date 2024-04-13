@@ -3,7 +3,7 @@ import React from "react";
 export function HomeContent() {
 
   return (
-    <div className="text-white m-8 w-full justify-center">
+    <div className="text-white m-8 justify-center">
       <h1 className="text-center text-banner font-heading">
         SOLAR
       </h1>

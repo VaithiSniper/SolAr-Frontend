@@ -159,7 +159,6 @@ export function useCase() {
             const caseAccounts: any = await program.account.case.all()
             setIsNotInAnyCase(false)
             setCases(caseAccounts)
-            console.log("after setting cases", searchKey)
             if (searchKey) {
               setCurrentViewingCase(getCurrentViewingCaseBySearchKey(caseAccounts, searchKey))
               setLoading(false)
@@ -203,13 +202,10 @@ export function useCase() {
   }, [currentViewingCase])
 
   const getCurrentViewingCaseBySearchKey = (caseAccounts: CaseAccount[], searchKey: string) => {
-    console.log("Searching for:", searchKey);
-    console.log("All case accounts:", caseAccounts);
     if (caseAccounts && caseAccounts.length > 0 && searchKey) {
       const caseFound = caseAccounts.find((caseItem) => (
         caseItem.publicKey?.toBase58() === searchKey
       ));
-      console.log("Found case:", caseFound);
       return (caseFound)
     }
   }
@@ -263,12 +259,10 @@ export function useCase() {
 
   const addMemberToParty = async (caseAddress: PublicKey, memberAddress: PublicKey, partyType: PartyType) => {
     if (program && publicKey) {
-      console.log(caseAddress.toBase58(), memberAddress.toBase58(), partyType)
       try {
         const [memberPda] = findProgramAddressSync([utf8.encode('USER_STATE'), memberAddress.toBuffer()], program.programId)
         const [judgePda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
         const party = { [`${partyType}`.toLowerCase()]: {} }
-        console.log(memberPda, judgePda, party)
         await program.methods.addMemberToParty(memberAddress, party)
           .accounts({
             case: caseAddress,

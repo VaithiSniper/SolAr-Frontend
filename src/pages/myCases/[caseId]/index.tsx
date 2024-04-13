@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router"
 import BreadcrumbsNavComponent from "@components/layout/breadcrumbs-nav"
 import { Crumb } from "@components/layout/breadcrumbs-nav"
@@ -8,18 +8,21 @@ import Modal from "@components/general/modal"
 import { useUser } from "src/hooks/userHooks";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { PartyType, useCase } from "src/hooks/caseHooks";
-import { useDocument } from "src/hooks/documentHooks";
+import { ArweaveFile, useDocument } from "src/hooks/documentHooks";
 import { QrReader } from 'react-qr-reader';
 import { toast } from "react-hot-toast";
 import { PublicKey } from "@solana/web3.js";
 import { MemberView } from "@components/case/MemberView";
+import { useArweave } from "src/hooks/arweaveHooks";
+import { FileMetadata } from '@pages/appwrite'
 
 export default function CaseViewPage() {
   const router = useRouter()
 
+  const { handleUploadToArweave, setFileBufferVal, getAllRecordsFromArweave } = useArweave()
   const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading } = useCase()
-  const { user, loading, setLoading } = useUser()
-  const { uploadedFile, party, setParty, setUploadedFile, handleUpload, } = useDocument()
+  const { user, setLoading } = useUser()
+  const { uploadedFile, party, setParty, setUploadedFile, handleUploadToAppwrite, hasUploadedDocument, setHasUploadedDocument, arweaveFileList } = useDocument()
   const [data, setData] = useState<string>('');
   const [navData, setNavData] = useState<Crumb[]>([])
   const { publicKey } = useWallet()
@@ -32,9 +35,7 @@ export default function CaseViewPage() {
   const activeTabStyles = "tab text-white text-md tab-active"
 
   useEffect(() => {
-    console.log("in useEffect, outside")
     if (currentViewingCase) {
-      console.log("in useEffect, first if condition")
       if (prosecutorsAddressList.length > 0 && prosecutorsAddressList.includes(publicKey?.toBase58() as string)) {
         setParty("prosecutor")
         return
@@ -53,6 +54,9 @@ export default function CaseViewPage() {
         router.push("/")
       }
     }
+  }, [currentViewingCase, party])
+
+  useEffect(() => {
     if (currentViewingCase && party) {
       const fetchRecords = async () => {
         const res = await fetch(`/api/appwrite/storage/documents?caseId=${currentViewingCase.publicKey.toBase58()}&party=${party}`,
@@ -62,15 +66,19 @@ export default function CaseViewPage() {
               "Content-Type": "application/json",
             },
           });
-        const data = await res.json();
-        if (data.data && data.data.length > 0) {
+        const { data } = await res.json();
+        let arweaveFiles = await getAllRecordsFromArweave()
+        arweaveFiles = arweaveFiles?.concat(data)
+        console.log("All documents for this case -> ", arweaveFiles)
+        if (data && data.length > 0) {
           setHasNoDocuments(false)
-          setDocuments(data.data);
+          setDocuments(arweaveFiles);
         }
       };
       fetchRecords();
+      setHasUploadedDocument(false)
     }
-  }, [currentViewingCase, party]);
+  }, [party, hasUploadedDocument, currentViewingCase]);
 
   const emptyDocumentListStyles = "h-2/5 gap-12 mt-4 p-2 w-3/4"
   const nonEmptyDocumentListStyles = "h-2/5 gap-12 mt-4 p-2 w-3/4 grid grid-cols-4 col-span-4"
@@ -101,13 +109,35 @@ export default function CaseViewPage() {
     }
   }, [data])
 
+
+  const processFile = (file: File) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => {
+      setFileBufferVal(reader.result as ArrayBuffer);
+    };
+  };
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0] as File
       setUploadedFile(file);
+      processFile(file)
     }
     return
   };
+
+  const handleFileUpload = async (e: FormEvent) => {
+    e.preventDefault()
+    if (user.typeOfUser.client) {
+      await handleUploadToAppwrite(router.query.caseId as string, party as "prosecutor" | "defendant")
+      setHasUploadedDocument(true)
+    }
+    else {
+      await handleUploadToArweave()
+      setHasUploadedDocument(true)
+    }
+  }
 
   const handleAddMemberToParty = async () => {
     if (!data || data.length !== 44) {
@@ -155,7 +185,7 @@ export default function CaseViewPage() {
                   <label
                     htmlFor="casename"
                     className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >
+                  >-KBLmU8hBZ-KqkhAD8ErjVseSxB1ROoxZMLkpkqveaI
                     Wallet Address
                   </label>
                 </div>
@@ -189,7 +219,7 @@ export default function CaseViewPage() {
                 Upload your document
               </h1>
               <input onChange={handleChange} type="file" className="file-input file-input-bordered file-input-secondary w-full" />
-              <Button state={!uploadedFile ? "disabled" : "initial"} onClick={(e) => { handleUpload(e, router.query.caseId as string, "defendant") }} className="self-center hover:underline bg-green-700 hover:bg-green-8000 text-white w-1/3" >Upload</Button>
+              <Button state={!uploadedFile ? "disabled" : "initial"} onClick={handleFileUpload} className="self-center hover:underline bg-green-700 hover:bg-green-8000 text-white w-1/3" >Upload</Button>
             </form>
           </Modal>
           <Modal id="ViewMembersModal">
@@ -207,7 +237,7 @@ export default function CaseViewPage() {
               currentViewingCase && currentViewingCase.account.name ?
                 <div className="text-4xl">{currentViewingCase?.account.name}</div>
                 :
-                <div className="skeleton w-48 h-18"></div>
+                <div className="skeleton w-48 h-18 my-8"></div>
             }
             <Button state="initial" onClick={() => { document.getElementById("FileUploadModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Upload documents +</Button>
           </div>
@@ -236,7 +266,7 @@ export default function CaseViewPage() {
               <div className={hasNoDocuments ? emptyDocumentListStyles : nonEmptyDocumentListStyles}>
                 {
                   !hasNoDocuments ?
-                    documents.map((file) => <FileCardComponent key={file.name} caseId={router.query.caseId as string} fileName={file.name} fileId={file["$id"]} />)
+                    documents.map((file: ArweaveFile | FileMetadata) => <FileCardComponent key={file.name} caseId={router.query.caseId as string} fileName={file.name} fileId={(typeof file === 'object' && file.source === "appwrite" && '$id' in file) ? file["$id"] : file.href as string} fileHref={file.href} fileSource={file.source} fileMimeType={file.mimeType} />)
                     :
                     <div className="flex flex-row justify-center w-full">
                       <div className="flex flex-col gap-y-8 m-2">
@@ -263,7 +293,9 @@ export default function CaseViewPage() {
                 ))
               }
             </ul>
-            <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+            {
+              user.typeOfUser.judge && <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+            }
             <Button state="initial" onClick={() => { document.getElementById("ViewMembersModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >View members</Button>
           </div>
         </div>

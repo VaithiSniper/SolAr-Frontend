@@ -6,6 +6,78 @@ const appwriteProjectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || ""
 const appwriteDatabaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || ""
 const appwriteStorageBucketId = process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID || ""
 
+export type FileMetadata = {
+  /**
+   * File ID.
+   */
+  $id: string;
+  /**
+   * Bucket ID.
+   */
+  bucketId: string;
+  /**
+   * File creation date in ISO 8601 format.
+   */
+  $createdAt: string;
+  /**
+   * File update date in ISO 8601 format.
+   */
+  $updatedAt: string;
+  /**
+   * File permissions. [Learn more about permissions](https://appwrite.io/docs/permissions).
+   */
+  $permissions: string[];
+  /**
+   * File name.
+   */
+  name: string;
+  /**
+   * Data URL.
+   */
+  href?: HrefURL;
+  /**
+   * Data URL.
+   */
+  source?: "appwrite" | "arweave";
+  /**
+   * File MD5 signature.
+   */
+  signature: string;
+  /**
+   * File mime type.
+   */
+  mimeType: string;
+  /**
+   * File original size in bytes.
+   */
+  sizeOriginal: number;
+  /**
+   * Total number of chunks available
+   */
+  chunksTotal: number;
+  /**
+   * Total number of chunks uploaded
+   */
+  chunksUploaded: number;
+};
+
+export interface HrefURL {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  toString(): string;
+  readonly origin: string;
+  password: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  readonly searchParams: URLSearchParams;
+  username: string;
+  toJSON(): string;
+}
+
 function renameFile(originalFile: File, newName: string) {
   return new File([originalFile], newName, {
     type: originalFile.type,
@@ -66,7 +138,7 @@ async function getFilesListFromStorageForCaseId(caseId: string) {
   return await storage.listFiles(appwriteStorageBucketId, [Query.startsWith("name", caseId)])
 }
 
-async function getDocumentsFromStorage(fileId: string) {
+async function getDocumentFromStorage(fileId: string) {
   const storage = getStorageInstance()
   return await storage.getFile(appwriteStorageBucketId, fileId);
 }
@@ -101,4 +173,4 @@ type UnverifiedJudges = {
 }
 
 export type { UnverifiedJudges }
-export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentsFromStorage, getDocumentPreviewFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }
+export { addDocumentToDB, getDocumentMetadataFromDB, deleteDocumentFromDB, addDocumentToStorage, getDocumentFromStorage, getDocumentPreviewFromStorage, getFilesListFromStorageForCaseId, deleteDocumentFromStorage }

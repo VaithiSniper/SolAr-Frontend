@@ -149,7 +149,6 @@ export function useUser() {
             "Content-Type": "application/json",
           },
         });
-        console.log("verificationResult", verificationResult)
         toast.success('Successfully verified judge.')
       } catch (err: any) {
         toast.error(err.toString())

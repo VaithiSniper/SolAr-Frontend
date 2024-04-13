@@ -1,12 +1,10 @@
-import { Header } from "@components/layout/header"
 import { useRouter } from "next/router"
-import Link from "next/link"
+import FilePreviewer from 'react-file-previewer';
 import BreadcrumbsNavComponent from "@components/layout/breadcrumbs-nav"
 import { Crumb } from "@components/layout/breadcrumbs-nav"
 import { useCase } from "src/hooks/caseHooks"
 import { useEffect, useState } from "react"
 import { Button } from "@components/general/button"
-import { getDocumentPreviewFromStorage, getDocumentsFromStorage } from "@pages/appwrite"
 import { useDocument } from "src/hooks/documentHooks"
 
 export default function DocumentViewPage() {
@@ -14,20 +12,27 @@ export default function DocumentViewPage() {
   const router = useRouter()
 
   const { searchKey, setSearchKey, currentViewingCase } = useCase()
-  const { currentViewingDocument, setCurrentViewingDocument, currentViewingDocumentHref, setCurrentViewingDocumentHref } = useDocument()
+  const { currentViewingDocument, setCurrentViewingDocument, currentViewingDocumentId, setCurrentViewingDocumentId, party } = useDocument()
 
   const [navData, setNavData] = useState<Crumb[]>([])
 
-  const fileView = getDocumentPreviewFromStorage("6612e848a02ae6746d72")
-  const fileViewUrl = fileView.href
-
   useEffect(() => {
     if (router.query.docId as string) {
-      setCurrentViewingDocument(router.query.docId as string)
-      const fileView = getDocumentPreviewFromStorage(router.query.docId as string)
-      setCurrentViewingDocumentHref(fileView.href)
+      setCurrentViewingDocumentId(router.query.docId as string)
+      const getDocument = async () => {
+        const result = await fetch(`/api/appwrite/storage/documents?caseId=${router.query.caseId}&party=${party}&docId=${router.query.docId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+        const { data } = await result.json()
+        setCurrentViewingDocument(data)
+      }
+      getDocument()
     }
-  }, [router.query.docId, currentViewingDocument, currentViewingDocumentHref])
+  }, [router.query.docId, currentViewingDocumentId, currentViewingDocument])
 
 
 
@@ -46,7 +51,7 @@ export default function DocumentViewPage() {
           link: `/myCases/${router.query.caseId as string}`
         },
         {
-          name: router.query.docId as string,
+          name: currentViewingDocument?.name as string,
           link: router.query.docId as string
         }
       ])
@@ -58,13 +63,17 @@ export default function DocumentViewPage() {
       <BreadcrumbsNavComponent data={navData} />
       <div className="flex flex-col">
         <div className="flex mx-4 mt-4 flex-row text-white  justify-between w-full">
-          <div className="text-4xl">{router.query.docId as string}</div>
+          <div className="text-4xl">{currentViewingDocument?.name}</div>
         </div>
         <div className="flex flex-row">
-          <div className="flex flex-row w-3/4 mt-8 justify-center">
-            <iframe src={currentViewingDocumentHref} width="960" height="640" allow="autoplay"></iframe>
+          <div className="flex flex-row w-3/4 m-8 p-4 justify-center items-center text-white gap-y-4 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400 rounded-xl">
+            <FilePreviewer file={{
+              url: currentViewingDocument?.href,
+              name: currentViewingDocument?.name,
+            }} hideControls={true}
+            />
           </div>
-          <div className="flex mt-4 h-screen flex-col ml-6 gap-y-6 border border-white p-8 rounded-xl">
+          <div className="flex mt-4 flex-col ml-6 gap-y-6 border border-white p-8 rounded-xl">
             <div className="text-2xl text-white">Document Timeline</div>
             <ul className="steps text-white steps-vertical">
               {

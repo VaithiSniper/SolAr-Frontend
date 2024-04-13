@@ -33,11 +33,13 @@ export function MemberView() {
     return judge.concat(prosecutors, defendants)
   }, [members])
 
+  // TODO: Replace with actual member list
+
   return (
     <ul className="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
       {
         sortedParticipantList.map(member => (
-          <li className="pb-3 sm:pb-4">
+          <li className="pb-3 sm:pb-4" key={member.username}>
             <div className="flex items-center space-x-4 rtl:space-x-reverse">
               <div className="flex-shrink-0">
                 <Avatar imageOrChar={member.username.substring(0, 1)} mini={true} />

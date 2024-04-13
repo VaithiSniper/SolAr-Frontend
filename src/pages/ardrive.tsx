@@ -11,18 +11,18 @@ const arDrivePassword = process.env.ARDRIVE_WALLET_PASSWORD;
 
 function getArDriveInstance() {
   // Read wallet from file
-  const myWallet = readJWKFile('../../ardrive-wallet.json');
+  const myWallet = readJWKFile('ardrive-wallet.json');
   // Construct ArDrive class
   return arDriveFactory({ wallet: myWallet });
 }
 
 async function createDrive(caseId: string) {
   const arDrive = getArDriveInstance()
-  const createDriveResult = await arDrive.createPublicDrive({ driveName: caseId });
+  return await arDrive.createPublicDrive({ driveName: caseId });
 }
 
 async function getDriveKey(driveId: string) {
-  const myWallet = readJWKFile('../../ardrive-wallet.json');
+  const myWallet = readJWKFile('ardrive-wallet.json');
   return await deriveDriveKey(
     arDrivePassword || "",
     driveId,

@@ -13,7 +13,6 @@ const NotificationAPIComponent = memo(() => {
   useEffect(() => {
     const loadNotificationAPI = async () => {
       const NotificationAPI = (await import("notificationapi-js-client-sdk")).default;
-      console.log("In notificationapi with -> ", clientId, userId)
       const notificationapi = new NotificationAPI({
         clientId,
         userId,
