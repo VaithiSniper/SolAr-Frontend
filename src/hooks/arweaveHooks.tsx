@@ -89,7 +89,7 @@ export function useArweave() {
       {
         name: "arweave-upload.png",
         mimeType: "image/png",
-        txnId: "4smqMHf2rrOWPaOaKdMkBSW2Uwy_eZBpYe0UFpFOjvU"
+        txnId: "WVC76ayZuTGfOMlgjaKzT72tTUeYV9tGuNF5718g13k"
       }
     ]
     const _fileList: ArweaveFile[] = []
@@ -104,11 +104,11 @@ export function useArweave() {
 
   const retrieveFileFromArweave = async (txnId: string) => {
     arweave.transactions.getStatus(txnId).then((res) => {
-      console.log(res.status)
+      console.log("txn status", res.status)
     });
 
     const result = await arweave.transactions.get(txnId);
-    console.log(result.data);
+    console.log("txn data", result.data);
 
     const base64String = btoa(
       String.fromCharCode(...new Uint8Array(result.data))

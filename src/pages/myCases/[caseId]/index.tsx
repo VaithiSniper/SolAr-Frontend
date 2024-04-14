@@ -70,7 +70,7 @@ export default function CaseViewPage() {
         let arweaveFiles = await getAllRecordsFromArweave()
         arweaveFiles = arweaveFiles?.concat(data)
         console.log("All documents for this case -> ", arweaveFiles)
-        if (data && data.length > 0) {
+        if (arweaveFiles && arweaveFiles.length > 0) {
           setHasNoDocuments(false)
           setDocuments(arweaveFiles);
         }

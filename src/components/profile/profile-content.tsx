@@ -101,6 +101,12 @@ export function ProfileContent() {
             "Content-Type": "application/json",
           },
         });
+      const requestVerificatioResult = await fetch("/api/notify/request-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       toast.success("Sent request successfully!")
     }
     catch (err: any) {
