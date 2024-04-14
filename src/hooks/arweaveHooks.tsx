@@ -89,7 +89,7 @@ export function useArweave() {
       {
         name: "arweave-upload.png",
         mimeType: "image/png",
-        txnId: "4smqMHf2rrOWPaOaKdMkBSW2Uwy_eZBpYe0UFpFOjvU"
+        txnId: "7VQbo7V6LWKTB5Tn9mZ2jqbGwy1rzJRaGfjcjez_ss8"
       }
     ]
     const _fileList: ArweaveFile[] = []

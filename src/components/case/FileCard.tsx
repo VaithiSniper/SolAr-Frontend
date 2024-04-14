@@ -5,6 +5,8 @@ import { HrefURL } from "@pages/appwrite"
 
 export default function FileCardComponent({ caseId, fileId, fileName, fileHref, fileSource, fileMimeType }: { caseId: string, fileId: string, fileName: string, fileHref?: HrefURL | base64String | string, fileSource: "appwrite" | "arweave", fileMimeType: string }) {
 
+
+  console.log("case id", caseId)
   return (
     <button key={caseId + fileId} className="p-4 flex flex-col justify-center items-center text-white gap-y-4 w-72 h-52 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400 rounded-xl">
       <Link href={"/myCases/" + caseId + "/" + fileId}>
