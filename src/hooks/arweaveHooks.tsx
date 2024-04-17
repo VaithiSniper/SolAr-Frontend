@@ -1,70 +1,82 @@
-import { ArweaveAddress } from 'ardrive-core-js';
-import Arweave from 'arweave';
-import { arrayFlatten } from 'arweave/node/lib/merkle';
-import { JWKInterface } from 'arweave/node/lib/wallet';
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { ArweaveFile, base64String, TxnIDAccount, useDocument } from './documentHooks';
+import { ArweaveAddress } from "ardrive-core-js";
+import Arweave from "arweave";
+import { arrayFlatten } from "arweave/node/lib/merkle";
+import { JWKInterface } from "arweave/node/lib/wallet";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
+import {
+  ArweaveFile,
+  base64String,
+  TxnIDAccount,
+  useDocument,
+} from "./documentHooks";
 
 export function useArweave() {
+  const [arweaveKey, setArweaveKey] = useState<JWKInterface>();
+  const [arweaveAddress, setArweaveAddress] = useState<string>();
+  const [isArweaveKeySet, setIsArweaveKeySet] = useState<boolean>(false);
+  const [txnId, setTxnId] = useState<string>("");
+  const [fileBufferVal, setFileBufferVal] = useState<ArrayBuffer>();
 
-  const [arweaveKey, setArweaveKey] = useState<JWKInterface>()
-  const [arweaveAddress, setArweaveAddress] = useState<string>()
-  const [isArweaveKeySet, setIsArweaveKeySet] = useState<boolean>(false)
-  const [txnId, setTxnId] = useState<string>("")
-  const [fileBufferVal, setFileBufferVal] = useState<ArrayBuffer>()
+  const { setArweaveFileList } = useDocument();
 
-  const { setArweaveFileList } = useDocument()
-
-  const arweave = useMemo(() => (Arweave.init({
-    host: '127.0.0.1',
-    port: 1984,
-    protocol: 'http'
-  })), [])
+  const arweave = useMemo(
+    () =>
+      Arweave.init({
+        host: "127.0.0.1",
+        port: 1984,
+        protocol: "http",
+      }),
+    []
+  );
 
   useEffect(() => {
     const createWalletAndAddress = async () => {
-      const key = await arweave.wallets.generate()
+      const key = await arweave.wallets.generate();
       setArweaveKey(key);
-      const address = await arweave.wallets.jwkToAddress(key)
+      const address = await arweave.wallets.jwkToAddress(key);
       setArweaveAddress(address);
-      setIsArweaveKeySet(true)
-    }
-    createWalletAndAddress()
+      setIsArweaveKeySet(true);
+    };
+    createWalletAndAddress();
   }, [isArweaveKeySet]);
 
   const addToWalletBalance = async (amount: string) => {
     try {
-      const tokens = arweave.ar.arToWinston(amount)
-      await arweave.api.get(`mint/${arweaveAddress}/${tokens}`)
+      const tokens = arweave.ar.arToWinston(amount);
+      await arweave.api.get(`mint/${arweaveAddress}/${tokens}`);
+    } catch (err: any) {
+      console.log(err);
     }
-    catch (err: any) {
-      console.log(err)
-    }
-  }
+  };
 
   const testBalanceAndAddTokens = async () => {
-    let balanceInWinston = await arweave.wallets.getBalance(arweaveAddress as string)
-    let balanceInAR = arweave.ar.winstonToAr(balanceInWinston)
-    console.log(`Wallet ${arweaveAddress}'s balance is -> `, balanceInAR)
+    let balanceInWinston = await arweave.wallets.getBalance(
+      arweaveAddress as string
+    );
+    let balanceInAR = arweave.ar.winstonToAr(balanceInWinston);
+    console.log(`Wallet ${arweaveAddress}'s balance is -> `, balanceInAR);
     if (Number(balanceInAR) < 5) {
-      console.log("Reached adding balance")
-      await addToWalletBalance("20")
+      console.log("Reached adding balance");
+      await addToWalletBalance("20");
     }
-    balanceInWinston = await arweave.wallets.getBalance(arweaveAddress as string)
-    balanceInAR = arweave.ar.winstonToAr(balanceInWinston)
-    console.log(`Wallet ${arweaveAddress}'s balance is -> `, balanceInAR)
-  }
+    balanceInWinston = await arweave.wallets.getBalance(
+      arweaveAddress as string
+    );
+    balanceInAR = arweave.ar.winstonToAr(balanceInWinston);
+    console.log(`Wallet ${arweaveAddress}'s balance is -> `, balanceInAR);
+  };
 
   const addDocumentToArweave = async () => {
     // First, make sure current wallet has enough balance
-    await testBalanceAndAddTokens()
-    console.log("In addDocumentToArweave -> ", fileBufferVal)
+    await testBalanceAndAddTokens();
+    console.log("In addDocumentToArweave -> ", fileBufferVal);
     let data = fileBufferVal;
     let transaction = await arweave.createTransaction(
       { data: data },
       arweaveKey
     );
+    const txnId = transaction.id;
     transaction.addTag("Content-Type", "image/png");
     try {
       await arweave.transactions.sign(transaction, arweaveKey);
@@ -75,12 +87,11 @@ export function useArweave() {
           `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
         );
       }
-      return true
-    }
-    catch (err: any) {
-      console.log(err)
+      return { txnId, status: true };
+    } catch (err: any) {
+      console.log(err);
       // toast.error(err.toSring())
-      return false
+      return { txnId, status: false };
     }
   };
 
@@ -89,49 +100,67 @@ export function useArweave() {
       {
         name: "arweave-upload.png",
         mimeType: "image/png",
-        txnId: "WVC76ayZuTGfOMlgjaKzT72tTUeYV9tGuNF5718g13k"
-      }
-    ]
-    const _fileList: ArweaveFile[] = []
+        txnId: "xOhJ4-H41nUoxDBmHOZ_EwF43btBKMXmxN7aGs9E-Qo",
+      },
+    ];
+    const _fileList: ArweaveFile[] = [];
     for (let i = 0; i < txnIdAccountList.length; i++) {
-      const txnIdAccount = txnIdAccountList[i]
-      const href = await retrieveFileFromArweave(txnIdAccount.txnId)
-      _fileList.push({ href, name: txnIdAccount.name, mimeType: txnIdAccount.mimeType, source: "arweave" })
+      const txnIdAccount = txnIdAccountList[i];
+      const href = await retrieveFileFromArweave(txnIdAccount.txnId);
+      _fileList.push({
+        href,
+        name: txnIdAccount.name,
+        mimeType: txnIdAccount.mimeType,
+        source: "arweave",
+      });
     }
-    return _fileList
+    return _fileList;
     // setArweaveFileList(_fileList)
-  }
+  };
 
   const retrieveFileFromArweave = async (txnId: string) => {
     arweave.transactions.getStatus(txnId).then((res) => {
-      console.log("txn status", res.status)
+      console.log("txn status", res.status);
     });
 
     const result = await arweave.transactions.get(txnId);
     console.log("txn data", result.data);
 
-    const base64String = btoa(
-      String.fromCharCode(...new Uint8Array(result.data))
+    // const base64String = btoa(
+    //   String.fromCharCode(...new Uint8Array(result.data))
+    // );
+
+    const base64string2 = btoa(
+      new Uint8Array(result.data).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ""
+      )
     );
 
-    return (`${base64String}`);
+    return `${base64string2}`;
   };
 
   const handleUploadToArweave = async () => {
     if (!fileBufferVal) {
-      toast.error("Please choose a file first!")
-      return
+      toast.error("Please choose a file first!");
+      return;
     }
-    let success: boolean = false;
-    success = await addDocumentToArweave()
+    const { status: success, txnId } = await addDocumentToArweave();
     if (success) {
-      toast.success('Successfully uploaded!')
+      toast.success("Successfully uploaded!");
+    } else {
+      toast.error("Error occurred while uploading!");
     }
-    else {
-      toast.error('Error occurred while uploading!')
-    }
+    return txnId;
     // Now send tx to change the fields
-  }
+  };
 
-  return { arweaveKey, addDocumentToArweave, retrieveFileFromArweave, handleUploadToArweave, setFileBufferVal, getAllRecordsFromArweave }
+  return {
+    arweaveKey,
+    addDocumentToArweave,
+    retrieveFileFromArweave,
+    handleUploadToArweave,
+    setFileBufferVal,
+    getAllRecordsFromArweave,
+  };
 }

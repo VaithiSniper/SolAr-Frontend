@@ -198,6 +198,33 @@
       ]
     },
     {
+      "name": "addDocumentToCaseAndParty",
+      "accounts": [
+        {
+          "name": "case",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "partyType",
+          "type": {
+            "defined": "PartyType"
+          }
+        },
+        {
+          "name": "docId",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "declareWinner",
       "accounts": [
         {
@@ -343,6 +370,26 @@
   ],
   "types": [
     {
+      "name": "Document",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "mimeType",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "Party",
       "type": {
         "kind": "struct",
@@ -365,6 +412,12 @@
           {
             "name": "size",
             "type": "u8"
+          },
+          {
+            "name": "documents",
+            "type": {
+              "vec": "string"
+            }
           }
         ]
       }
@@ -487,6 +540,6 @@
     }
   ],
   "metadata": {
-    "address": "BJmSaQfGGfnuDVuz6EZRjbNyxmcGUVVR3JVovPmCaeoA"
+    "address": "C3A31N8aBPaCPVQ3QAqPeeYWiHj3yGZFqrBtcK54UPTL"
   }
 }
