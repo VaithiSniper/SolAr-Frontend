@@ -17,6 +17,7 @@ export type Party = {
   type_of_party: PartyType,
   members: [PublicKey?],
   memberAccounts: [UserProfile?],
+  documents: [string?],
   size: number,
 }
 export type Case = {
@@ -57,12 +58,14 @@ export const initialDefaultCase: CaseAccount = {
       type_of_party: "Prosecutor" as PartyType,
       members: [],
       memberAccounts: [],
+      documents: [],
       size: 0
     },
     defendant: {
       type_of_party: "Defendant" as PartyType,
       members: [],
       memberAccounts: [],
+      documents: [],
       size: 0
     },
     caseWinner: "Defendant" as PartyType,
@@ -120,11 +123,15 @@ export function useCase() {
             judgeAccount,
             prosecutor: {
               members: prosecutors,
-              memberAccounts: prosecutorsAccount
+              memberAccounts: prosecutorsAccount,
+              documents: currentViewingCase?.account.prosecutor.documents,
+              size: currentViewingCase?.account.prosecutor.size
             },
             defendant: {
               members: defendants,
-              memberAccounts: defendantsAccount
+              memberAccounts: defendantsAccount,
+              documents: currentViewingCase?.account.prosecutor.documents,
+              size: currentViewingCase?.account.prosecutor.size
             },
             events: [
               {
@@ -279,5 +286,26 @@ export function useCase() {
     }
   }
 
-  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList }
+  const addDocumentToCaseAndParty = async (caseAddress: PublicKey, docId: string, partyType: PartyType) => {
+    if (program && publicKey) {
+      try {
+        console.log("caseAddress ->", caseAddress.toBase58())
+        console.log("partyType ->", partyType)
+        console.log("docId ->", docId)
+        const tx = await program.methods.addDocumentToCaseAndParty(partyType, docId)
+          .accounts({
+            case: caseAddress,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully added document details.')
+      } catch (err: any) {
+        toast.error(err.toString())
+      } finally {
+      }
+    }
+  }
+
+
+  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList, addDocumentToCaseAndParty }
 }

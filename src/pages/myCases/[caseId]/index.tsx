@@ -67,6 +67,8 @@ export default function CaseViewPage() {
             },
           });
         const { data } = await res.json();
+        const arweaveDocumentList: [string?] = currentViewingCase.account[`${party}`].documents
+        console.log(currentViewingCase.account)
         let arweaveFiles = await getAllRecordsFromArweave()
         arweaveFiles = arweaveFiles?.concat(data)
         console.log("All documents for this case -> ", arweaveFiles)
@@ -134,7 +136,10 @@ export default function CaseViewPage() {
       setHasUploadedDocument(true)
     }
     else {
-      const txnId = await handleUploadToArweave()
+      const presidingJudge = currentViewingCase?.account.judge
+      const caseId: PublicKey = new PublicKey(router.query.caseId as string)
+      const partyType: PartyType = { [`${party}`.toLowerCase()]: {} }
+      const txnId = await handleUploadToArweave(caseId, partyType)
       setHasUploadedDocument(true)
     }
   }

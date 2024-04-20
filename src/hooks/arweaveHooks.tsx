@@ -1,9 +1,10 @@
-import { ArweaveAddress } from "ardrive-core-js";
+import { ArweaveAddress, PublicKey } from "ardrive-core-js";
 import Arweave from "arweave";
 import { arrayFlatten } from "arweave/node/lib/merkle";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
+import { PartyType, useCase } from "./caseHooks";
 import {
   ArweaveFile,
   base64String,
@@ -19,6 +20,7 @@ export function useArweave() {
   const [fileBufferVal, setFileBufferVal] = useState<ArrayBuffer>();
 
   const { setArweaveFileList } = useDocument();
+  const { addDocumentToCaseAndParty } = useCase()
 
   const arweave = useMemo(
     () =>
@@ -67,7 +69,8 @@ export function useArweave() {
     console.log(`Wallet ${arweaveAddress}'s balance is -> `, balanceInAR);
   };
 
-  const addDocumentToArweave = async () => {
+
+  const addDocumentToArweave = async (caseId: PublicKey, party: PartyType) => {
     // First, make sure current wallet has enough balance
     await testBalanceAndAddTokens();
     console.log("In addDocumentToArweave -> ", fileBufferVal);
@@ -76,7 +79,6 @@ export function useArweave() {
       { data: data },
       arweaveKey
     );
-    const txnId = transaction.id;
     transaction.addTag("Content-Type", "image/png");
     try {
       await arweave.transactions.sign(transaction, arweaveKey);
@@ -87,21 +89,26 @@ export function useArweave() {
           `${uploader.pctComplete}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
         );
       }
+      const txnId = uploader.toJSON().transaction.id
       return { txnId, status: true };
     } catch (err: any) {
       console.log(err);
       // toast.error(err.toSring())
-      return { txnId, status: false };
+      return { txnId: "", status: false };
     }
   };
 
   const getAllRecordsFromArweave = async () => {
+    // if (arweaveDocumentList.length === 0) {
+    //   return
+    // }
+
     const txnIdAccountList: TxnIDAccount[] = [
-      {
-        name: "arweave-upload.png",
-        mimeType: "image/png",
-        txnId: "xOhJ4-H41nUoxDBmHOZ_EwF43btBKMXmxN7aGs9E-Qo",
-      },
+      // {
+      //   name: "arweave-upload.png",
+      //   mimeType: "image/png",
+      //   txnId: "xOhJ4-H41nUoxDBmHOZ_EwF43btBKMXmxN7aGs9E-Qo",
+      // },
     ];
     const _fileList: ArweaveFile[] = [];
     for (let i = 0; i < txnIdAccountList.length; i++) {
@@ -140,12 +147,13 @@ export function useArweave() {
     return `${base64string2}`;
   };
 
-  const handleUploadToArweave = async () => {
+  const handleUploadToArweave = async (caseId: PublicKey, party: PartyType) => {
     if (!fileBufferVal) {
       toast.error("Please choose a file first!");
       return;
     }
-    const { status: success, txnId } = await addDocumentToArweave();
+    const { status: success, txnId } = await addDocumentToArweave(caseId, party);
+    await addDocumentToCaseAndParty(caseId, txnId, party)
     if (success) {
       toast.success("Successfully uploaded!");
     } else {
