@@ -113,7 +113,9 @@ export function ProfileContent() {
   };
 
   const handleSendVerification = async () => {
-    if (user.email === "" && user.firstName === "" && user.lastName === "") {
+    const formDirty = (userProfile.email !== "" || userProfile.firstName !== "" || userProfile.lastName !== "" || userProfile.phone !== "")
+    const userInfo = (user.email === "" && user.firstName === "" && user.lastName === "")
+    if (userInfo || !formDirty) {
       toast.error("Please fill your profile first!");
       return;
     }
@@ -142,6 +144,8 @@ export function ProfileContent() {
       toast.success("Sent request successfully!");
     } catch (err: any) {
       toast.error(err.toString());
+    } finally {
+      router.reload()
     }
   };
 
@@ -150,21 +154,17 @@ export function ProfileContent() {
       <h1 className="text-center text-banner font-heading">Profile</h1>
       <Modal id="QRCodeModal">
         <>
-          <Image
-            src={publickKey || ""}
-            alt="QR Code"
-            height="256"
-            width="256"
-            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-          />
+          {
+            publicKey?.toBase58() as string &&
+            <Image
+              src={publickKey || ""}
+              alt="QR Code"
+              height="256"
+              width="256"
+              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+            />
+          }
         </>
-        {/* publicKey?.toBase58() as string */}
-        {/* <QRCode */}
-        {/*   size={256} */}
-        {/*   style={{ height: "auto", maxWidth: "100%", width: "100%" }} */}
-        {/*   value={""} */}
-        {/*   viewBox={`0 0 256 256`} */}
-        {/* /> */}
       </Modal>
       <div className="justify-center flex">
         <div className="card w-96 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400">

@@ -225,6 +225,36 @@
       ]
     },
     {
+      "name": "getDocumentsListForCaseAndParty",
+      "accounts": [
+        {
+          "name": "case",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "partyType",
+          "type": {
+            "defined": "PartyType"
+          }
+        },
+        {
+          "name": "docId",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "vec": "string"
+      }
+    },
+    {
       "name": "declareWinner",
       "accounts": [
         {
@@ -540,6 +570,6 @@
     }
   ],
   "metadata": {
-    "address": "C3A31N8aBPaCPVQ3QAqPeeYWiHj3yGZFqrBtcK54UPTL"
+    "address": "DL79DkQFevrJrjVFhi8W2sSgaxizW84vwxviTggQThvY"
   }
 }

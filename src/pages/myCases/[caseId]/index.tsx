@@ -7,7 +7,7 @@ import { Button } from "@components/general/button"
 import Modal from "@components/general/modal"
 import { useUser } from "src/hooks/userHooks";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { PartyType, useCase } from "src/hooks/caseHooks";
+import { CaseState, CaseStatePairs, PartyType, useCase } from "src/hooks/caseHooks";
 import { ArweaveFile, useDocument } from "src/hooks/documentHooks";
 import { QrReader } from 'react-qr-reader';
 import { toast } from "react-hot-toast";
@@ -20,7 +20,7 @@ export default function CaseViewPage() {
   const router = useRouter()
 
   const { handleUploadToArweave, setFileBufferVal, getAllRecordsFromArweave } = useArweave()
-  const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading } = useCase()
+  const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading, getStatusMessageAndStylesForCaseState, changeCaseState } = useCase()
   const { user, setLoading } = useUser()
   const { uploadedFile, party, setParty, setUploadedFile, handleUploadToAppwrite, hasUploadedDocument, setHasUploadedDocument, arweaveFileList } = useDocument()
   const [data, setData] = useState<string>('');
@@ -29,6 +29,10 @@ export default function CaseViewPage() {
 
   const [documents, setDocuments] = useState<any>()
   const [hasNoDocuments, setHasNoDocuments] = useState<boolean>(true)
+
+
+  const [caseState, setCaseState] = useState<CaseState>();
+  const [showCaseStateConfirmButton, setShowCaseStateConfirmButton] = useState<boolean>(false);
 
   const [selectedProsecutorTab, setSelectedProsecutorTab] = useState<boolean>(true);
   const inactiveTabStyles = "tab text-white text-md"
@@ -144,6 +148,16 @@ export default function CaseViewPage() {
     }
   }
 
+  const handleCaseStateChange = async () => {
+    try {
+      await changeCaseState(new PublicKey(router.query.caseId as string), { [`${caseState}`]: {} } as CaseState)
+      setShowCaseStateConfirmButton(false)
+    }
+    catch (err) {
+
+    }
+  }
+
   const handleAddMemberToParty = async () => {
     if (!data || data.length !== 44) {
       toast.error("Address is invalid!")
@@ -240,7 +254,27 @@ export default function CaseViewPage() {
           <div className="flex mx-4 mt-4 flex-row text-white  justify-between w-full">
             {
               currentViewingCase && currentViewingCase.account.name ?
-                <div className="text-4xl">{currentViewingCase?.account.name}</div>
+                <div className="text-4xl">
+                  {currentViewingCase?.account.name}
+                  {
+                    user.typeOfUser.judge ?
+                      <>
+                        <select className={"ml-4 rounded-xl select select-bordered select-md"} onChange={(e) => { setCaseState(e.target.value as CaseState); setShowCaseStateConfirmButton(true); }}>
+                          {
+                            Object.values(CaseStatePairs).map(({ message: CaseStateTag, classNames }, index) => (
+                              <option value={Object.keys(CaseStatePairs)[index]} className={classNames + " my-4 text-lg font-light rounded-xl"} selected={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message === CaseStateTag} disabled={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message === CaseStateTag}>{CaseStateTag}</option>
+                            ))
+                          }
+                        </select>
+                        {
+                          showCaseStateConfirmButton &&
+                          <Button state="initial" onClick={handleCaseStateChange} className="hover:underline bg-success hover:bg-success text-white ml-4" >✓</Button>
+                        }
+                      </>
+                      :
+                      <span className={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).classNames + " text-lg opacity-90 ml-4 border border-fuchsia-600 rounded-xl p-2"}>{getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message}</span>
+                  }
+                </div>
                 :
                 <div className="skeleton w-48 h-18 my-8"></div>
             }
@@ -299,7 +333,8 @@ export default function CaseViewPage() {
               }
             </ul>
             {
-              user.typeOfUser.judge && <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+              user.typeOfUser.judge &&
+              <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
             }
             <Button state="initial" onClick={() => { document.getElementById("ViewMembersModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >View members</Button>
           </div>
