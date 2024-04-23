@@ -144,12 +144,21 @@ export default function CaseViewPage() {
   const processFile = (file: File) => {
     const { name, type } = file
     setFileMetadata({ name, mimeType: type })
+    const { name, type } = file
+    setFileMetadata({ name, mimeType: type })
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
       setFileBufferVal(reader.result as ArrayBuffer);
     };
   };
+
+  const toBase64 = (file: File) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+  });
 
   const toBase64 = (file: File) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -183,8 +192,8 @@ export default function CaseViewPage() {
 
   const handleCaseWinnerChange = async () => {
     try {
-      await declareCaseWinner(new PublicKey(router.query.caseId as string), caseWinner as boolean)
-      setShowCaseWinnerConfirmButton(false)
+      await changeCaseState(new PublicKey(router.query.caseId as string), { [`${caseState}`]: {} } as CaseState)
+      setShowCaseStateConfirmButton(false)
     }
     catch (err) {
 
