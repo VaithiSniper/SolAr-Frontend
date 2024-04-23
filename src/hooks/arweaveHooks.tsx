@@ -1,3 +1,4 @@
+import { base64 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import { ArweaveAddress, PublicKey } from "ardrive-core-js";
 import Arweave from "arweave";
 import { arrayFlatten } from "arweave/node/lib/merkle";
@@ -12,12 +13,20 @@ import {
   useDocument,
 } from "./documentHooks";
 
+export type Tag = [string, string]
+export type FileTags = Tag[]
+export type FileMetadata = {
+  name: string;
+  mimeType: string;
+}
+
 export function useArweave() {
   const [arweaveKey, setArweaveKey] = useState<JWKInterface>();
   const [arweaveAddress, setArweaveAddress] = useState<string>();
   const [isArweaveKeySet, setIsArweaveKeySet] = useState<boolean>(false);
   const [txnId, setTxnId] = useState<string>("");
   const [fileBufferVal, setFileBufferVal] = useState<ArrayBuffer>();
+  const [fileMetadata, setFileMetadata] = useState<FileMetadata>();
 
   const { setArweaveFileList } = useDocument();
   const { addDocumentToCaseAndParty } = useCase()
@@ -73,13 +82,19 @@ export function useArweave() {
   const addDocumentToArweave = async (caseId: PublicKey, party: PartyType) => {
     // First, make sure current wallet has enough balance
     await testBalanceAndAddTokens();
-    console.log("In addDocumentToArweave -> ", fileBufferVal);
     let data = fileBufferVal;
     let transaction = await arweave.createTransaction(
       { data: data },
       arweaveKey
     );
-    transaction.addTag("Content-Type", "image/png");
+    const tags: FileTags = [
+      ["name", fileMetadata?.name as string],
+      ["mimeType", fileMetadata?.mimeType as string],
+    ]
+    tags.forEach((tag) => {
+      const [key, value] = tag;
+      transaction.addTag(key, value);
+    });
     try {
       await arweave.transactions.sign(transaction, arweaveKey);
       let uploader = await arweave.transactions.getUploader(transaction);
@@ -104,20 +119,19 @@ export function useArweave() {
     // }
 
     const txnIdAccountList: TxnIDAccount[] = [
-      // {
-      //   name: "arweave-upload.png",
-      //   mimeType: "image/png",
-      //   txnId: "xOhJ4-H41nUoxDBmHOZ_EwF43btBKMXmxN7aGs9E-Qo",
-      // },
+      {
+        name: "arweave-upload.png",
+        mimeType: "image/png",
+        txnId: "_VroBa-6_D9Al_b-gGXvxCGB86mNIUVf-YTDHVoSPlU",
+      },
     ];
     const _fileList: ArweaveFile[] = [];
     for (let i = 0; i < txnIdAccountList.length; i++) {
       const txnIdAccount = txnIdAccountList[i];
-      const href = await retrieveFileFromArweave(txnIdAccount.txnId);
+      const { href, tags } = await retrieveFileFromArweave(txnIdAccount.txnId);
       _fileList.push({
+        ...tags,
         href,
-        name: txnIdAccount.name,
-        mimeType: txnIdAccount.mimeType,
         source: "arweave",
       });
     }
@@ -125,26 +139,37 @@ export function useArweave() {
     // setArweaveFileList(_fileList)
   };
 
+  function addPadding(base64String: string) {
+    // Calculate the number of padding characters needed
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    return base64String + padding;
+  }
+
   const retrieveFileFromArweave = async (txnId: string) => {
     arweave.transactions.getStatus(txnId).then((res) => {
       console.log("txn status", res.status);
     });
 
     const result = await arweave.transactions.get(txnId);
-    console.log("txn data", result.data);
 
-    // const base64String = btoa(
-    //   String.fromCharCode(...new Uint8Array(result.data))
-    // );
-
-    const base64string2 = btoa(
+    const base64string = btoa(
       new Uint8Array(result.data).reduce(
         (data, byte) => data + String.fromCharCode(byte),
         ""
       )
     );
 
-    return `${base64string2}`;
+    let tags: { [s: string]: string } = {};
+    result.tags.forEach(({ name, value }) => {
+      const tagKey = base64.decode(addPadding(name)).toString();
+      const tagValue = base64.decode(addPadding(value)).toString();
+      tags[tagKey] = tagValue
+    })
+
+    return {
+      tags,
+      href: `${base64string}`,
+    };
   };
 
   const handleUploadToArweave = async (caseId: PublicKey, party: PartyType) => {
@@ -153,8 +178,8 @@ export function useArweave() {
       return;
     }
     const { status: success, txnId } = await addDocumentToArweave(caseId, party);
-    await addDocumentToCaseAndParty(caseId, txnId, party)
     if (success) {
+      await addDocumentToCaseAndParty(caseId, txnId, party)
       toast.success("Successfully uploaded!");
     } else {
       toast.error("Error occurred while uploading!");
@@ -170,5 +195,6 @@ export function useArweave() {
     handleUploadToArweave,
     setFileBufferVal,
     getAllRecordsFromArweave,
+    setFileMetadata
   };
 }

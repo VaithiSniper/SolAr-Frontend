@@ -225,36 +225,6 @@
       ]
     },
     {
-      "name": "getDocumentsListForCaseAndParty",
-      "accounts": [
-        {
-          "name": "case",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "partyType",
-          "type": {
-            "defined": "PartyType"
-          }
-        },
-        {
-          "name": "docId",
-          "type": "string"
-        }
-      ],
-      "returns": {
-        "vec": "string"
-      }
-    },
-    {
       "name": "declareWinner",
       "accounts": [
         {
@@ -446,8 +416,15 @@
           {
             "name": "documents",
             "type": {
-              "vec": "string"
+              "array": [
+                "string",
+                10
+              ]
             }
+          },
+          {
+            "name": "documentsCount",
+            "type": "u8"
           }
         ]
       }
@@ -570,6 +547,6 @@
     }
   ],
   "metadata": {
-    "address": "DL79DkQFevrJrjVFhi8W2sSgaxizW84vwxviTggQThvY"
+    "address": "DTr36m7e12rJWnwdQgWQxdMyYkDKyyDJn21AXqR3orCh"
   }
 }

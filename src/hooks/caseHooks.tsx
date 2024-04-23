@@ -302,7 +302,7 @@ export function useCase() {
         console.log("caseAddress ->", caseAddress.toBase58())
         console.log("partyType ->", partyType)
         console.log("docId ->", docId)
-        const tx = await program.methods.addDocumentToCaseAndParty(partyType, docId)
+        const tx = await program.methods.addDocumentToCaseAndParty(partyType, docId.toString())
           .accounts({
             case: caseAddress,
             systemProgram: SystemProgram.programId,

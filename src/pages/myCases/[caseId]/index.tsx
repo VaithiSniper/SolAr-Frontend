@@ -19,7 +19,7 @@ import { FileMetadata } from '@pages/appwrite'
 export default function CaseViewPage() {
   const router = useRouter()
 
-  const { handleUploadToArweave, setFileBufferVal, getAllRecordsFromArweave } = useArweave()
+  const { handleUploadToArweave, setFileBufferVal, setFileMetadata, getAllRecordsFromArweave } = useArweave()
   const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading, getStatusMessageAndStylesForCaseState, changeCaseState } = useCase()
   const { user, setLoading } = useUser()
   const { uploadedFile, party, setParty, setUploadedFile, handleUploadToAppwrite, hasUploadedDocument, setHasUploadedDocument, arweaveFileList } = useDocument()
@@ -117,6 +117,8 @@ export default function CaseViewPage() {
 
 
   const processFile = (file: File) => {
+    const { name, type } = file
+    setFileMetadata({ name, mimeType: type })
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
