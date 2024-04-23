@@ -115,7 +115,7 @@ export function ProfileContent() {
   const handleSendVerification = async () => {
     const formDirty = (userProfile.email !== "" || userProfile.firstName !== "" || userProfile.lastName !== "" || userProfile.phone !== "")
     const userInfo = (user.email === "" && user.firstName === "" && user.lastName === "")
-    if (userInfo || !formDirty) {
+    if (userInfo && !formDirty) {
       toast.error("Please fill your profile first!");
       return;
     }

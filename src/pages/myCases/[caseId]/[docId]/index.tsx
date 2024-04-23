@@ -5,7 +5,8 @@ import { Crumb } from "@components/layout/breadcrumbs-nav"
 import { useCase } from "src/hooks/caseHooks"
 import { useEffect, useState } from "react"
 import { Button } from "@components/general/button"
-import { useDocument } from "src/hooks/documentHooks"
+import { ArweaveFile, useDocument } from "src/hooks/documentHooks"
+import { useArweave } from "src/hooks/arweaveHooks";
 
 export default function DocumentViewPage() {
 
@@ -13,28 +14,38 @@ export default function DocumentViewPage() {
 
   const { searchKey, setSearchKey, currentViewingCase } = useCase()
   const { currentViewingDocument, setCurrentViewingDocument, currentViewingDocumentId, setCurrentViewingDocumentId, party } = useDocument()
+  const { retrieveFileFromArweave } = useArweave()
 
   const [navData, setNavData] = useState<Crumb[]>([])
 
   useEffect(() => {
-    if (router.query.docId as string) {
+    if (router.query.docId as string && router.query.source as string) {
       setCurrentViewingDocumentId(router.query.docId as string)
       const getDocument = async () => {
-        const result = await fetch(`/api/appwrite/storage/documents?caseId=${router.query.caseId}&party=${party}&docId=${router.query.docId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-        const { data } = await result.json()
-        setCurrentViewingDocument(data)
+        if (router.query.source === "appwrite") {
+          const result = await fetch(`/api/appwrite/storage/documents?caseId=${router.query.caseId}&party=${party}&docId=${router.query.docId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+          const { data } = await result.json()
+          setCurrentViewingDocument(data)
+        }
+        else {
+          let arweaveFile: any = await retrieveFileFromArweave(router.query.docId as string);
+          const data: ArweaveFile = {
+            ...arweaveFile.tags,
+            txnId: router.query.docId as string,
+            href: arweaveFile.href
+          };
+          setCurrentViewingDocument(data)
+        }
       }
       getDocument()
     }
-  }, [router.query.docId, currentViewingDocumentId, currentViewingDocument])
-
-
+  }, [router.query.docId, currentViewingDocumentId])
 
   useEffect(() => {
     if (router.query.caseId as string) {
@@ -67,11 +78,21 @@ export default function DocumentViewPage() {
         </div>
         <div className="flex flex-row">
           <div className="flex flex-row w-3/4 m-8 p-4 justify-center items-center text-white gap-y-4 bg-[#0B0708] border-white border shadow-md shadow-fuchsia-400 rounded-xl">
-            <FilePreviewer file={{
-              url: currentViewingDocument?.href,
-              name: currentViewingDocument?.name,
-            }} hideControls={true}
-            />
+            {
+              router.query.source as string === "appwrite" ?
+                <FilePreviewer file={{
+                  url: currentViewingDocument?.href,
+                  name: currentViewingDocument?.name,
+                }} hideControls={true}
+                />
+                :
+                <FilePreviewer file={{
+                  data: currentViewingDocument?.href,
+                  mimeType: currentViewingDocument?.mimeType,
+                  name: currentViewingDocument?.name
+                }} />
+
+            }
           </div>
           <div className="flex mt-4 flex-col ml-6 gap-y-6 border border-white p-8 rounded-xl">
             <div className="text-2xl text-white">Document Timeline</div>

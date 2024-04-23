@@ -31,7 +31,7 @@ export default function UserCasesViewPage() {
               </>
               :
               (
-                isNotInAnyCase && cases.length === 0 ?
+                cases.length === 0 || isNotInAnyCase ?
                   <div className="flex flex-row justify-center w-full">
                     <div className="flex flex-col gap-y-8 m-6 p-6">
                       <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">

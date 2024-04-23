@@ -11,6 +11,7 @@ export type DocumentId = string;
 export type base64String = string;
 export type ArweaveFile = {
   name: string;
+  txnId: string;
   href: base64String;
   mimeType: string;
   source: "appwrite" | "arweave"
@@ -28,7 +29,7 @@ export function useDocument() {
   const [arweaveFileList, setArweaveFileList] = useState<ArweaveFile[]>()
   const [party, setParty] = useState<PartyTypeString>()
   const [currentViewingDocumentId, setCurrentViewingDocumentId] = useState<DocumentId>()
-  const [currentViewingDocument, setCurrentViewingDocument] = useState<FileMetadata>()
+  const [currentViewingDocument, setCurrentViewingDocument] = useState<FileMetadata | ArweaveFile>()
   const [hasUploadedDocument, setHasUploadedDocument] = useState<boolean>(false)
 
   const handleUploadToAppwrite = async (caseId: string, party: string) => {
