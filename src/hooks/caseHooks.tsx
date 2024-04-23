@@ -18,6 +18,7 @@ export type Party = {
   members: [PublicKey?],
   memberAccounts: [UserProfile?],
   documents: [string?],
+  documentsCount: number,
   size: number,
 }
 export type Case = {
@@ -59,6 +60,7 @@ export const initialDefaultCase: CaseAccount = {
       members: [],
       memberAccounts: [],
       documents: [],
+      documentsCount: 0,
       size: 0
     },
     defendant: {
@@ -66,6 +68,7 @@ export const initialDefaultCase: CaseAccount = {
       members: [],
       memberAccounts: [],
       documents: [],
+      documentsCount: 0,
       size: 0
     },
     caseWinner: "Defendant" as PartyType,
@@ -127,17 +130,9 @@ export function useCase() {
         if (defendants.length > 0)
           defendantsAccount = overallParticipantsAccounts.slice(1 + prosecutors.length, overallParticipantsAccounts.length) as UserProfile[]
 
-        // Get the array of documents
-        // const prosecutorDocumentIdList = await program.methods.getDocumentsListForCaseAndParty({ prosecutor: {} })
-        //   .accounts({
-        //     case: currentCasePDA
-        //   })
-        //   .rpc()
-        // const defendantDocumentIdList = await program.methods.getDocumentsListForCaseAndParty({ defendant: {} })
-        //   .accounts({
-        //     case: currentCasePDA
-        //   })
-        //   .rpc()
+        const prosecutorDocumentIdList: string[] = new Array(currentCase.prosecutor.documentsCount).fill(defaultCaseAddressPubkey).map((_, index) => (currentCase.prosecutor.documents[index] as string))
+        const defendantDocumentIdList: string[] = new Array(currentCase.defendant.documentsCount).fill(defaultCaseAddressPubkey).map((_, index) => (currentCase.defendant.documents[index] as string))
+
         // Prepare the case account for pushing
         const _caseAccount = {
           account: {
@@ -146,13 +141,14 @@ export function useCase() {
             prosecutor: {
               members: prosecutors,
               memberAccounts: prosecutorsAccount,
-              documents: [],
+              documents: prosecutorDocumentIdList,
+              documentsCount: currentViewingCase?.account.prosecutor.documentsCount,
               size: currentViewingCase?.account.prosecutor.size
             },
             defendant: {
               members: defendants,
               memberAccounts: defendantsAccount,
-              documents: [],
+              documents: defendantDocumentIdList,
               size: currentViewingCase?.account.prosecutor.size
             },
             events: [
@@ -299,9 +295,6 @@ export function useCase() {
   const addDocumentToCaseAndParty = async (caseAddress: PublicKey, docId: string, partyType: PartyType) => {
     if (program && publicKey) {
       try {
-        console.log("caseAddress ->", caseAddress.toBase58())
-        console.log("partyType ->", partyType)
-        console.log("docId ->", docId)
         const tx = await program.methods.addDocumentToCaseAndParty(partyType, docId.toString())
           .accounts({
             case: caseAddress,
@@ -338,5 +331,24 @@ export function useCase() {
     }
   }
 
-  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList, addDocumentToCaseAndParty, changeCaseState }
+  const declareCaseWinner = async (caseAddress: PublicKey, partyBool: boolean) => {
+    if (program && publicKey) {
+      try {
+        const [judgePda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        const tx = await program.methods.declareWinner(partyBool)
+          .accounts({
+            case: caseAddress,
+            judge: judgePda,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully declared winner.')
+      } catch (err: any) {
+        toast.error(err.toString())
+      } finally {
+      }
+    }
+  }
+
+  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList, addDocumentToCaseAndParty, changeCaseState, declareCaseWinner }
 }

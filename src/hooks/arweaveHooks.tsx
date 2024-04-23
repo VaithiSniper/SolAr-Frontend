@@ -113,30 +113,22 @@ export function useArweave() {
     }
   };
 
-  const getAllRecordsFromArweave = async () => {
-    // if (arweaveDocumentList.length === 0) {
-    //   return
-    // }
+  const getAllRecordsFromArweave = async (arweaveDocumentList: [string?]) => {
+    if (arweaveDocumentList.length === 0) {
+      return
+    }
 
-    const txnIdAccountList: TxnIDAccount[] = [
-      {
-        name: "arweave-upload.png",
-        mimeType: "image/png",
-        txnId: "_VroBa-6_D9Al_b-gGXvxCGB86mNIUVf-YTDHVoSPlU",
-      },
-    ];
     const _fileList: ArweaveFile[] = [];
-    for (let i = 0; i < txnIdAccountList.length; i++) {
-      const txnIdAccount = txnIdAccountList[i];
-      const { href, tags } = await retrieveFileFromArweave(txnIdAccount.txnId);
+    for (let i = 0; i < arweaveDocumentList.length; i++) {
+      const { href, tags } = await retrieveFileFromArweave(arweaveDocumentList[i] as string);
       _fileList.push({
         ...tags,
         href,
+        txnId: arweaveDocumentList[i] as string,
         source: "arweave",
       });
     }
     return _fileList;
-    // setArweaveFileList(_fileList)
   };
 
   function addPadding(base64String: string) {
@@ -146,6 +138,7 @@ export function useArweave() {
   }
 
   const retrieveFileFromArweave = async (txnId: string) => {
+
     arweave.transactions.getStatus(txnId).then((res) => {
       console.log("txn status", res.status);
     });
@@ -165,6 +158,8 @@ export function useArweave() {
       const tagValue = base64.decode(addPadding(value)).toString();
       tags[tagKey] = tagValue
     })
+
+    console.log(tags)
 
     return {
       tags,
