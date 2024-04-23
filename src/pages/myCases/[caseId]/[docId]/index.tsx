@@ -47,8 +47,6 @@ export default function DocumentViewPage() {
     }
   }, [router.query.docId, currentViewingDocumentId])
 
-
-
   useEffect(() => {
     if (router.query.caseId as string) {
       setSearchKey(router.query.caseId as string)
