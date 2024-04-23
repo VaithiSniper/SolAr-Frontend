@@ -17,6 +17,7 @@ export type Party = {
   type_of_party: PartyType,
   members: [PublicKey?],
   memberAccounts: [UserProfile?],
+  documents: [string?],
   size: number,
 }
 export type Case = {
@@ -57,18 +58,29 @@ export const initialDefaultCase: CaseAccount = {
       type_of_party: "Prosecutor" as PartyType,
       members: [],
       memberAccounts: [],
+      documents: [],
       size: 0
     },
     defendant: {
       type_of_party: "Defendant" as PartyType,
       members: [],
       memberAccounts: [],
+      documents: [],
       size: 0
     },
     caseWinner: "Defendant" as PartyType,
     caseState: "ToStart" as CaseState,
     events: [] as CaseEvent[]
   }
+}
+
+export const CaseStatePairs: { [state: string]: { message: string, classNames: string } } = {
+  "toStart": { message: "Yet to start", classNames: "text-sm text-yellow-500 font-bold" },
+  "waitingForParticipants": { message: "Waiting for participants", classNames: "text-sm text-yellow-300 font-bold" },
+  "active": { message: "Active", classNames: "text-sm text-green-500 font-bold" },
+  "disposed": { message: "Disposed", classNames: "text-sm text-red-500 font-bold" },
+  "completed": { message: "Completed", classNames: "text-sm text-fushcia-500 font-bold" },
+  "awaitingRuling": { message: "Awating Ruling", classNames: "text-sm text-blue-500 font-bold" }
 }
 
 export function useCase() {
@@ -101,6 +113,7 @@ export function useCase() {
       const caseAccountsArray: CaseAccount[] = []
       for (let index = 0; index < caseAccounts.length; index++) {
         const currentCase = caseAccounts[index];
+        const currentCasePDA = listOfCases[index];
         const prosecutors: PublicKey[] = new Array(currentCase.prosecutor.size).fill(defaultCaseAddressPubkey).map((_, index) => (currentCase.prosecutor.members[index] as PublicKey))
         const defendants: PublicKey[] = new Array(currentCase.defendant.size).fill(defaultCaseAddressPubkey).map((_, index) => (currentCase.defendant.members[index] as PublicKey))
         const presidingJudge: PublicKey[] = [currentCase.judge]
@@ -113,6 +126,18 @@ export function useCase() {
           prosecutorsAccount = overallParticipantsAccounts.slice(1, 1 + prosecutors.length) as UserProfile[]
         if (defendants.length > 0)
           defendantsAccount = overallParticipantsAccounts.slice(1 + prosecutors.length, overallParticipantsAccounts.length) as UserProfile[]
+
+        // Get the array of documents
+        // const prosecutorDocumentIdList = await program.methods.getDocumentsListForCaseAndParty({ prosecutor: {} })
+        //   .accounts({
+        //     case: currentCasePDA
+        //   })
+        //   .rpc()
+        // const defendantDocumentIdList = await program.methods.getDocumentsListForCaseAndParty({ defendant: {} })
+        //   .accounts({
+        //     case: currentCasePDA
+        //   })
+        //   .rpc()
         // Prepare the case account for pushing
         const _caseAccount = {
           account: {
@@ -120,11 +145,15 @@ export function useCase() {
             judgeAccount,
             prosecutor: {
               members: prosecutors,
-              memberAccounts: prosecutorsAccount
+              memberAccounts: prosecutorsAccount,
+              documents: [],
+              size: currentViewingCase?.account.prosecutor.size
             },
             defendant: {
               members: defendants,
-              memberAccounts: defendantsAccount
+              memberAccounts: defendantsAccount,
+              documents: [],
+              size: currentViewingCase?.account.prosecutor.size
             },
             events: [
               {
@@ -157,16 +186,19 @@ export function useCase() {
           setLoading(true)
           if (isAdminUser) {
             const caseAccounts: any = await program.account.case.all()
-            setIsNotInAnyCase(false)
             setCases(caseAccounts)
             if (searchKey) {
               setCurrentViewingCase(getCurrentViewingCaseBySearchKey(caseAccounts, searchKey))
               setLoading(false)
             }
+            if (caseAccounts.length === 0) {
+              setIsNotInAnyCase(true)
+            }
           }
           else {
             if (isExisitingUser && user) {
               if (user.listOfCases.length > 0) {
+                console.log("Reached! ->", user.listOfCases)
                 const caseAccountsArray = await prepareCaseAccountsArray(user.listOfCases) as CaseAccount[]
                 setCases(caseAccountsArray)
               }
@@ -212,22 +244,7 @@ export function useCase() {
 
   const getStatusMessageAndStylesForCaseState = (state: CaseState): { message: string, classNames: string } => {
     const [extractedState] = Object.keys(state)
-    switch (extractedState) {
-      case "toStart":
-        return { message: "Yet to start", classNames: "text-sm text-yellow-500 font-bold" }
-      case "waitingForParticipants":
-        return { message: "Waiting for participants", classNames: "text-sm text-yellow-300 font-bold" }
-      case "active":
-        return { message: "Active", classNames: "text-sm text-green-500 font-bold" }
-      case "disposed":
-        return { message: "Disposed", classNames: "text-sm text-red-500 font-bold" }
-      case "completed":
-        return { message: "Completed", classNames: "text-sm text-fushcia-500 font-bold" }
-      case "awaitingRuling":
-        return { message: "Awating Ruling", classNames: "text-sm text-blue-500 font-bold" }
-      default:
-        return { message: "Invalid state", classNames: "text-sm text-red-500 font-bold" }
-    }
+    return CaseStatePairs[extractedState as string]
   }
 
 
@@ -279,5 +296,47 @@ export function useCase() {
     }
   }
 
-  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList }
+  const addDocumentToCaseAndParty = async (caseAddress: PublicKey, docId: string, partyType: PartyType) => {
+    if (program && publicKey) {
+      try {
+        console.log("caseAddress ->", caseAddress.toBase58())
+        console.log("partyType ->", partyType)
+        console.log("docId ->", docId)
+        const tx = await program.methods.addDocumentToCaseAndParty(partyType, docId)
+          .accounts({
+            case: caseAddress,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully added document details.')
+      } catch (err: any) {
+        toast.error(err.toString())
+      } finally {
+      }
+    }
+  }
+
+  const changeCaseState = async (caseAddress: PublicKey, caseState: CaseState) => {
+    if (program && publicKey) {
+      try {
+        console.log("caseAddress ->", caseAddress.toBase58())
+        console.log("caseState ->", caseState)
+        const [judgePda] = findProgramAddressSync([utf8.encode('USER_STATE'), publicKey.toBuffer()], program.programId)
+        console.log("judgePda->", judgePda)
+        const tx = await program.methods.setCaseState(caseState)
+          .accounts({
+            case: caseAddress,
+            judge: judgePda,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+        toast.success('Successfully updated case status.')
+      } catch (err: any) {
+        toast.error(err.toString())
+      } finally {
+      }
+    }
+  }
+
+  return { loading, setLoading, cases, setCases, currentViewingCase, searchKey, setSearchKey, isNotInAnyCase, initializeCase, getStatusMessageAndStylesForCaseState, addMemberToParty, prosecutorsAddressList, defendantsAddressList, addDocumentToCaseAndParty, changeCaseState }
 }

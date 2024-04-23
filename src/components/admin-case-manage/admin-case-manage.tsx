@@ -48,6 +48,12 @@ export const AdminCaseManage = () => {
                               </tr>
                             ))
                           }
+                          {
+                            isNotInAnyCase &&
+                            <tr key={"noCases"}>
+                              <td className="py-8 text-xl text-center font-sub" colSpan={4}>No cases found!</td>
+                            </tr>
+                          }
                         </tbody>
                       </table>
                     </div>

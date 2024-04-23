@@ -7,7 +7,7 @@ import { Button } from "@components/general/button"
 import Modal from "@components/general/modal"
 import { useUser } from "src/hooks/userHooks";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { PartyType, useCase } from "src/hooks/caseHooks";
+import { CaseState, CaseStatePairs, PartyType, useCase } from "src/hooks/caseHooks";
 import { ArweaveFile, useDocument } from "src/hooks/documentHooks";
 import { QrReader } from 'react-qr-reader';
 import { toast } from "react-hot-toast";
@@ -20,7 +20,7 @@ export default function CaseViewPage() {
   const router = useRouter()
 
   const { handleUploadToArweave, setFileBufferVal, getAllRecordsFromArweave } = useArweave()
-  const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading } = useCase()
+  const { searchKey, setSearchKey, currentViewingCase, addMemberToParty, prosecutorsAddressList, defendantsAddressList, loading: caseLoading, getStatusMessageAndStylesForCaseState, changeCaseState } = useCase()
   const { user, setLoading } = useUser()
   const { uploadedFile, party, setParty, setUploadedFile, handleUploadToAppwrite, hasUploadedDocument, setHasUploadedDocument, arweaveFileList } = useDocument()
   const [data, setData] = useState<string>('');
@@ -29,6 +29,10 @@ export default function CaseViewPage() {
 
   const [documents, setDocuments] = useState<any>()
   const [hasNoDocuments, setHasNoDocuments] = useState<boolean>(true)
+
+
+  const [caseState, setCaseState] = useState<CaseState>();
+  const [showCaseStateConfirmButton, setShowCaseStateConfirmButton] = useState<boolean>(false);
 
   const [selectedProsecutorTab, setSelectedProsecutorTab] = useState<boolean>(true);
   const inactiveTabStyles = "tab text-white text-md"
@@ -67,10 +71,12 @@ export default function CaseViewPage() {
             },
           });
         const { data } = await res.json();
+        const arweaveDocumentList: [string?] = currentViewingCase.account[`${party}`].documents
+        console.log(currentViewingCase.account)
         let arweaveFiles = await getAllRecordsFromArweave()
         arweaveFiles = arweaveFiles?.concat(data)
         console.log("All documents for this case -> ", arweaveFiles)
-        if ( arweaveFiles.length > 0) {
+        if (arweaveFiles && arweaveFiles.length > 0) {
           setHasNoDocuments(false)
           setDocuments(arweaveFiles);
         }
@@ -134,8 +140,21 @@ export default function CaseViewPage() {
       setHasUploadedDocument(true)
     }
     else {
-      await handleUploadToArweave()
+      const presidingJudge = currentViewingCase?.account.judge
+      const caseId: PublicKey = new PublicKey(router.query.caseId as string)
+      const partyType: PartyType = { [`${party}`.toLowerCase()]: {} }
+      const txnId = await handleUploadToArweave(caseId, partyType)
       setHasUploadedDocument(true)
+    }
+  }
+
+  const handleCaseStateChange = async () => {
+    try {
+      await changeCaseState(new PublicKey(router.query.caseId as string), { [`${caseState}`]: {} } as CaseState)
+      setShowCaseStateConfirmButton(false)
+    }
+    catch (err) {
+
     }
   }
 
@@ -185,7 +204,7 @@ export default function CaseViewPage() {
                   <label
                     htmlFor="casename"
                     className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                  >-KBLmU8hBZ-KqkhAD8ErjVseSxB1ROoxZMLkpkqveaI
+                  >
                     Wallet Address
                   </label>
                 </div>
@@ -235,7 +254,27 @@ export default function CaseViewPage() {
           <div className="flex mx-4 mt-4 flex-row text-white  justify-between w-full">
             {
               currentViewingCase && currentViewingCase.account.name ?
-                <div className="text-4xl">{currentViewingCase?.account.name}</div>
+                <div className="text-4xl">
+                  {currentViewingCase?.account.name}
+                  {
+                    user.typeOfUser.judge ?
+                      <>
+                        <select className={"ml-4 rounded-xl select select-bordered select-md"} onChange={(e) => { setCaseState(e.target.value as CaseState); setShowCaseStateConfirmButton(true); }}>
+                          {
+                            Object.values(CaseStatePairs).map(({ message: CaseStateTag, classNames }, index) => (
+                              <option value={Object.keys(CaseStatePairs)[index]} className={classNames + " my-4 text-lg font-light rounded-xl"} selected={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message === CaseStateTag} disabled={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message === CaseStateTag}>{CaseStateTag}</option>
+                            ))
+                          }
+                        </select>
+                        {
+                          showCaseStateConfirmButton &&
+                          <Button state="initial" onClick={handleCaseStateChange} className="hover:underline bg-success hover:bg-success text-white ml-4" >✓</Button>
+                        }
+                      </>
+                      :
+                      <span className={getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).classNames + " text-lg opacity-90 ml-4 border border-fuchsia-600 rounded-xl p-2"}>{getStatusMessageAndStylesForCaseState(currentViewingCase.account.caseState).message}</span>
+                  }
+                </div>
                 :
                 <div className="skeleton w-48 h-18 my-8"></div>
             }
@@ -294,7 +333,8 @@ export default function CaseViewPage() {
               }
             </ul>
             {
-              user.typeOfUser.judge && <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+              user.typeOfUser.judge &&
+              <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
             }
             <Button state="initial" onClick={() => { document.getElementById("ViewMembersModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >View members</Button>
           </div>

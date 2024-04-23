@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import notificationapi from "notificationapi-node-server-sdk";
+import { ADMIN_WALLET_PUBKEY } from "src/constants/admin";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,30 +17,23 @@ export default async function handler(
       clientSecret // clientSecret
     );
 
-    const receiverId = req.body.userId
-    const txnId = req.body.txnId
-
     try {
       notificationapi.send({
         notificationId: "new_comment",
+        templateId: "request_verification",
         user: {
-          id: receiverId,
-        },
-        mergeTags: {
-          txnAddress: txnId,
+          id: ADMIN_WALLET_PUBKEY,
         },
       });
 
       res.json({
-        txnId,
         status: 200,
-        message: `Notification sent successfully to ${receiverId}`,
+        message: `Notification sent successfully to Admin`,
       });
     }
     catch (err: any) {
 
       res.json({
-        txnId,
         status: 401,
         message: "Something went while sending the notification",
       });

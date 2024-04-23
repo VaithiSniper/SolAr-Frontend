@@ -85,6 +85,12 @@ export const AdminApprovalsContent = () => {
                         </thead>
                         <tbody>
                           {
+                            (!data || data.length === 0) &&
+                            <tr key={"noMembers"}>
+                              <td className="py-8 text-xl text-center font-sub" colSpan={selectedUnverifiedTab ? 4 : 3}>No members found!</td>
+                            </tr>
+                          }
+                          {
                             data &&
                             data.length > 0 &&
                             data.map((judge, index) => (
