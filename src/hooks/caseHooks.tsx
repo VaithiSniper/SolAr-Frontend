@@ -45,6 +45,7 @@ export enum CaseEventType {
 export type CaseEvent = {
   type: CaseEventType;
   message: string;
+  txnId: string;
   classNames: string;
 };
 
@@ -360,8 +361,8 @@ export function useCase() {
           })
           .rpc();
         toast.success("Successfully created case.");
-        createCaseDocument(casePda);
-        addEventToCase(
+        await createCaseDocument(casePda);
+        await addEventToCase(
           casePda,
           {
             type: CaseEventType.Created,
@@ -370,7 +371,7 @@ export function useCase() {
           },
           tx
         );
-        addEventToCase(
+        await addEventToCase(
           casePda,
           {
             type: CaseEventType.MemberAdded,
@@ -379,6 +380,7 @@ export function useCase() {
           },
           tx
         );
+        toast.success("Added initial case events.");
       } catch (err: any) {
         toast.error(err.toString());
       } finally {

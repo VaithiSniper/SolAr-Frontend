@@ -144,21 +144,12 @@ export default function CaseViewPage() {
   const processFile = (file: File) => {
     const { name, type } = file
     setFileMetadata({ name, mimeType: type })
-    const { name, type } = file
-    setFileMetadata({ name, mimeType: type })
     const reader = new FileReader();
     reader.readAsArrayBuffer(file);
     reader.onloadend = () => {
       setFileBufferVal(reader.result as ArrayBuffer);
     };
   };
-
-  const toBase64 = (file: File) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-  });
 
   const toBase64 = (file: File) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -489,9 +480,11 @@ export default function CaseViewPage() {
             <ul className="steps text-white steps-vertical">
               {currentViewingCase?.account.events.map((event) => (
                 <li className={event.classNames} key={event.message}>
-                  {event.message.length > 30
-                    ? `${event.message.substring(0, 26)}...`
-                    : event.message}
+                  <a href={`https://explorer.solana.com/tx/${event.txnId}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
+                    {event.message.length > 30
+                      ? `${event.message.substring(0, 26)}...`
+                      : event.message}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -507,7 +500,10 @@ export default function CaseViewPage() {
                   showCaseWinnerConfirmButton &&
                   <Button state="initial" onClick={handleCaseWinnerChange} className="hover:underline bg-success hover:bg-success text-white" >Declare winner</Button>
                 }
-                <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+                {
+                  !currentViewingCase?.account.caseState.toStart &&
+                  <Button state="initial" onClick={() => { document.getElementById("AddMembersToCase").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Add {party}</Button>
+                }
               </>
             }
             <Button state="initial" onClick={() => { document.getElementById("ViewMembersModal").showModal(); }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >View members</Button>
