@@ -177,7 +177,8 @@ export function useCase() {
             `/api/appwrite/database/caseHistory?caseId=${caseId.toBase58()}`
           );
           const data = await result.json();
-          console.log("data is", data);
+          if (!data)
+            return []
           const res = data.new_document.txnId.map((doc: any, idx: number) => {
             return {
               txnId: doc,
@@ -404,7 +405,7 @@ export function useCase() {
         const tx = await program.methods
           .addMemberToParty(memberAddress, party)
           .accounts({
-            case: caseAddress, 
+            case: caseAddress,
             user: memberPda,
             judge: judgePda,
             systemProgram: SystemProgram.programId,

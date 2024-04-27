@@ -137,7 +137,6 @@ async function getDocumentFromCaseId(collectionId: string, caseId: string) {
     collectionId,
     [Query.equal("caseId", [caseId])]
   );
-  console.log('APPWIRTE DOC', documents);
   return documents.documents[0];
 }
 

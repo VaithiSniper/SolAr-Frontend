@@ -206,7 +206,7 @@ export default function CaseViewPage() {
         [`${caseState}`]: {},
       } as CaseState);
       setShowCaseStateConfirmButton(false);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const handleAddMemberToParty = async () => {
@@ -418,7 +418,7 @@ export default function CaseViewPage() {
         </div>
         <div className="flex flex-row w-3/4 mx-4">
           {user.typeOfUser.judge &&
-          publicKey?.toBase58() ===
+            publicKey?.toBase58() ===
             currentViewingCase?.account.judge.toBase58() ? (
             <div
               role="tablist"
