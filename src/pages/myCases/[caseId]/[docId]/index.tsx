@@ -97,11 +97,15 @@ export default function DocumentViewPage() {
           <div className="flex mt-4 flex-col ml-6 gap-y-6 border border-white p-8 rounded-xl">
             <div className="text-2xl text-white">Document Timeline</div>
             <ul className="steps text-white steps-vertical">
-              {
-                currentViewingCase?.account.events.map(event => (
-                  <li className={event.classNames} key={event.message}>{event.message}</li>
-                ))
-              }
+              {currentViewingCase?.account.events.map((event) => (
+                <li className={event.classNames} key={event.message}>
+                  <a href={`https://explorer.solana.com/tx/${event.txnId}?cluster=devnet`} target="_blank" rel="noopener noreferrer">
+                    {event.message.length > 30
+                      ? `${event.message.substring(0, 26)}...`
+                      : event.message}
+                  </a>
+                </li>
+              ))}
             </ul>
             <Button state="initial" onClick={() => { }} className="hover:underline bg-fuchsia-400 hover:bg-fuchsia-600 text-black" >Update document</Button>
           </div>
