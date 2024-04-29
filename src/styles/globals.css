@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* @font-face { */
+/*   font-family: 'Harmoneux'; */
+/*   font-style: normal; */
+/*   font-weight: 400; */
+/*   src: local(''), url('/Harmoneux.ttf') format('ttf'); */
+/* } */

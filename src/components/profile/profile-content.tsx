@@ -121,11 +121,15 @@ export function ProfileContent() {
     }
     try {
       setLoading(true);
+      let name = `${user.firstName} ${user.lastName}`
+      if (formDirty) {
+        name = `${userProfile.firstName} ${userProfile.lastName}`
+      }
       const res = await fetch(`/api/appwrite/database/unverifiedJudges`, {
         method: "POST",
         body: JSON.stringify({
+          name,
           address: publicKey,
-          name: `${user.firstName} ${user.lastName}`,
           email: user.email,
         }),
         headers: {

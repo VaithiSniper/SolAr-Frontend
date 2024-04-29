@@ -70,7 +70,7 @@ export const AdminCaseCreate = () => {
           (
             <div className="flex flex-col w-full h-full text-white" >
               <div className="flex flex-row items-center justify-center w-full h-full">
-                <h1 className="text-5xl font-bold text-center font-heading mt-4">Create Case</h1>
+                <h1 className="text-5xl text-center font-heading mt-4">Create Case</h1>
               </div>
               <div className="justify-center flex">
                 <div className="card bg-base-100 shadow-xl">

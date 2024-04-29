@@ -17,11 +17,14 @@ export default function AvatarGroup({ imageOrCharGroup }: { imageOrCharGroup: st
           </div>
         ))
       }
-      <div className="avatar w-12 h-12 placeholder">
-        <div className="w-12 bg-neutral text-neutral-content">
-          <span>{imageOrCharGroup.length > 2 ? imageOrCharGroup.length - 2 : imageOrCharGroup.length}+</span>
+      {
+        imageOrCharGroup.length > 2 &&
+        <div className="avatar w-12 h-12 placeholder">
+          <div className="w-12 bg-neutral text-neutral-content">
+            <span>{imageOrCharGroup.length - 2}+</span>
+          </div>
         </div>
-      </div>
+      }
     </div>
   )
 }

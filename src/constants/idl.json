@@ -225,6 +225,22 @@
       ]
     },
     {
+      "name": "resetDocumentListForCase",
+      "accounts": [
+        {
+          "name": "case",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "declareWinner",
       "accounts": [
         {
@@ -547,6 +563,6 @@
     }
   ],
   "metadata": {
-    "address": "DTr36m7e12rJWnwdQgWQxdMyYkDKyyDJn21AXqR3orCh"
+    "address": "5mF1xDgEjzi6UXwvoPjXKz8ff9Gktz1eD2Dw4xpPsKRe"
   }
 }
